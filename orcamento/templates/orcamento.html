@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title%}Orçamentos{%endblock%}
+
+{% block content %}
+<div class="container">
+  <div class="row cartao" style="margin-top: 20px;">
+    <ul class="nav justify-content-center"> 
+      <li class="nav-item">
+        <a class="nav-link link" href="{% url 'orcamento' var1=1 %}">JAN</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link link" href="{% url 'orcamento' var1=2 %}">FEV</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link link" href="{% url 'orcamento' var1=3 %}">MAR</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link link" href="{% url 'orcamento' var1=4 %}">ABR</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link link" href="{% url 'orcamento' var1=5 %}">MAI</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link link" href="{% url 'orcamento' var1=6 %}">JUN</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link link" href="{% url 'orcamento' var1=7 %}">JUL</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link link" href="{% url 'orcamento' var1=8 %}">AGO</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link link" href="{% url 'orcamento' var1=9 %}">SET</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link link" href="{% url 'orcamento' var1=10 %}">OUT</a>
+      </li>
+      <li class="nav-item"> 
+        <a class="nav-link link" href="{% url 'orcamento' var1=11 %}">NOV</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link link" href="{% url 'orcamento' var1=12 %}">DEZ</a>
+      </li>
+    </ul>    
+  </div>
+  <div class="row" style="margin-top: 20px;">
+        <div class="col-md-auto">
+            <form id="form-entrada" action="cadastra_orcamento" method="POST">
+                {% csrf_token %}
+                <div style="margin-top: 10px;">
+                    <div class="row">
+                        <div class="col">
+                            <span>Categoria</span>
+                        </div>
+                        <div class="col">
+                            <span>Descrição</span>
+                        </div>
+                        <div class="col">
+                            <span>Valor</span>
+                        </div>
+                    </div>
+                    <input type="text" name="mes" style="display: none;" value="{{mes}}" id="mes">
+                    {% if orcamentos %}
+                    {% for orcamento in orcamentos %}
+                    <div>
+                        <input type="text" id="categoria" name="categoria" value="{{orcamento.categoria__nome}}" readonly>
+                        <input type="text" id="descricao" name="descricao">
+                        <input class="entrada" oninput="converte(this)" id="valor" name="valor" value="{{orcamento.soma}}">
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    {% for categoria in categorias %}
+                    <div>
+                        <input type="text" id="categoria" name="categoria" value="{{categoria.nome}}" readonly>
+                        <input type="text" id="descricao" name="descricao">
+                        <input class="entrada" oninput="converte(this)" id="valor" name="valor" value="0,00">
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" name="recorrencia">
+                  <label class="form-check-label" for="flexSwitchCheckDefault">Replicar orçamento nos meses seguintes</label>
+                </div>
+                <div>
+                    <input class="btn btn-primary mb-3" type="submit" value="ok">
+                </div>
+            </form>
+        </div>
+        <div class="col-md-auto">
+            <div>
+                <h2>Valor Total</h2>
+                <h2 id="resultado">R$</h2>
+            </div>
+            <div id="grafico" style="width: 450px; height: 450px;">
+                <label for="myChart"></label>
+                <canvas id="myChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{% static 'js/orcamento.js'%}"></script>
+
+{% endblock %}
