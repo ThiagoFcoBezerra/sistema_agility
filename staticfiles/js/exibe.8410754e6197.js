@@ -1,18 +1,5 @@
 
 grandeGrafico();
-miniGraficos();
-graficoAnual();
-
-function getTotal(elementos){
-    const listaTotal = [];
-    const valores = document.querySelectorAll(elementos);
-    for (let i = 0; i < valores.length; i++) {
-        let valor = parseFloat(valores[i].textContent.replace(',','.'));
-        valor = parseFloat(valor.toFixed(2));
-        listaTotal.push(valor);     
-    }
-    return listaTotal;
-}
 function grandeGrafico(){
     const valor = document.getElementById('valor-orc');
     const soma = document.getElementById('soma');
@@ -45,6 +32,7 @@ function grandeGrafico(){
     });
 }
 
+miniGraficos();
 function miniGraficos(){
 const graficos = document.querySelectorAll(".mini-grafico")
 
@@ -54,36 +42,31 @@ for(let i = 0; i < graficos.length; i++){
     graficos[i].style.background = `linear-gradient(90deg, rgb(85, 80, 155) calc(${valor} * 100%), transparent 0%)`;
 }
 }
-function graficoAnual(){
+
+graficoAnual();
+ function graficoAnual(){
     const labels = [
-        'Janeiro',
-        'Fevereiro',
-        'Março',
-        'Abril',
-        'Maio',
-        'Junho',
-        'Julho',
-        'Agosto',
-        'Setembro',
-        'Outubro',
-        'Novembro',
-        'Dezembro'
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+        'July'
       ];
     
       const data = {
         labels: labels,
         datasets: [{
-          label: 'Orçado',
-          fill: false,
+          label: 'My First dataset',
+          backgroundColor: 'rgb(0,255,255)',
           borderColor: 'rgb(0,255,255)',
-          data: getTotal('.total-orc'),
-          tension: 0.1
+          data: [0, 10, 5, 2, 20, 30, 45],
         },{
-          label: 'Realizado',
-          fill: false,
+          label: 'My First dataset',
+          backgroundColor: 'rgb(255,99,71)',
           borderColor: 'rgb(255,99,71)',
-          data: getTotal('.total-lanc'),
-          tension: 0.1
+          data: [10, 07, 8, 8, 17, 32, 50],
         }]
       };
     

@@ -9,14 +9,8 @@ from django.contrib.auth.decorators import login_required
 # Create your views here.
 
 def index(request):
-    form_lancamanto = LancamentoForm()
-    form_categoria = CategoriaForm()
-    context = {
-        'form_lanc': form_lancamanto,
-        'form_cat' : form_categoria,
-    }
 
-    return render(request, 'index.html', context)
+    return render(request, 'index.html')
 
 @login_required
 def testa_arquivo(request):
@@ -117,11 +111,12 @@ def cadastra_orcamento(request):
     return render(request, 'index.html')
 
 def exibir(item_indice, mes_sel):
-    lancamentos_exibir = Lancamento.objects.filter(categoria__id = item_indice, data_pagamento__month = mes_sel)
-                                  
+    lancamentos_exibir = Lancamento.objects.filter(categoria__id = item_indice, data_pagamento__month = mes_sel)                              
     orcamentos = Orcamento.objects.filter(categoria__id = item_indice, data_orcamento__month = mes_sel)
     resumo_categoria = Lancamento.objects.filter(data_pagamento__month = mes_sel).values('categoria__nome').annotate(soma = Sum('valor_pago')).order_by('categoria__nome')
-
+    lancamento_total_mensal = Lancamento.objects.filter(data_pagamento__year = 2022).values('data_pagamento__month').annotate(total=Sum('valor_pago'))
+    orcamento_total_mensal = Orcamento.objects.filter(data_orcamento__year = 2022).values('data_orcamento__month').annotate(total=Sum('valor_orc'))
+    
     lista_orcamento = []
     for t in resumo_categoria:
         orc = Orcamento.objects.all().filter(categoria__nome = t['categoria__nome'], data_orcamento__month = mes_sel)
@@ -170,7 +165,9 @@ def exibir(item_indice, mes_sel):
         'graf_nome': graf_nome,
         'resumo_categoria':resumo_categoria,
         'orcamento' : orc,
-        'lista_orcamento' : lista_orcamento
+        'lista_orcamento' : lista_orcamento,
+        'lancamento_total_mensal' : lancamento_total_mensal,
+        'orcamento_total_mensal': orcamento_total_mensal
         }
     
     return context

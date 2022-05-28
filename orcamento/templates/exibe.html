@@ -6,6 +6,7 @@
 {% block content %}
   <div class="container">
     {% if lista_orcamento %}
+    <!-- navbar -->
     <div class="row cartao" style="margin-top: 20px;">
       <ul class="nav justify-content-center"> 
         <li class="nav-item">
@@ -46,47 +47,51 @@
         </li>
       </ul>    
     </div>
+    <!-- navbar -->
     {% endif %}
     <div class="row">
       <div class="col-7">
         <h3>Orçamento</h3>
-          <div class="cartao">
-            <div class="row" style="margin-top: 3px; height: 24px;">
-              <div class="col-6" style="font-weight: bold;">
-                <p>Categoria</p>
-              </div>
-              <div class="col-md-auto">
-                <div style="width: 100px; text-align: center; font-weight: bold;">
-                  <p>Uso</p>
-                </div>
-              </div>
-              <div class="col-md-auto" style="font-weight: bold;">
-                <p>Saldo</p>
+        <!-- Tabela minigraficos -->
+        <div class="cartao">
+          <div class="row" style="margin-top: 3px; height: 24px;">
+            <div class="col-6" style="font-weight: bold;">
+              <p>Categoria</p>
+            </div>
+            <div class="col-md-auto">
+              <div style="width: 100px; text-align: center; font-weight: bold;">
+                <p>Uso</p>
               </div>
             </div>
-            {% if lista_orcamento %}
-            {% for item in lista_orcamento %}
-            <div class="row" style="margin-top: 3px; height: 24px;">
-              <div class="col-6">
-                <a class="link" href="{% url 'exibe_lancamentos2' var1=item.indice var2=item.mes %}">{{item.nome}}</a>
-              </div>
-              <div class="col-md-auto">
-                <div class = "mini-grafico">
-                  <p>{{item.uso_perc}}</p>
-                </div>
-              </div>
-              <div class="col-md-auto">
-                <p>R${{item.saldo}}</p>
-              </div>
+            <div class="col-md-auto" style="font-weight: bold;">
+              <p>Saldo</p>
             </div>
-            {% endfor %}
-            {% else %}
-            <h1>Sem Lançamentos no período!</h1>
-            {% endif %}
           </div>
+          {% if lista_orcamento %}
+          {% for item in lista_orcamento %}
+          <div class="row" style="margin-top: 3px; height: 24px;">
+            <div class="col-6">
+              <a class="link" href="{% url 'exibe_lancamentos2' var1=item.indice var2=item.mes %}">{{item.nome}}</a>
+            </div>
+            <div class="col-md-auto">
+              <div class = "mini-grafico">
+                <p>{{item.uso_perc}}</p>
+              </div>
+            </div>
+            <div class="col-md-auto">
+              <p>R${{item.saldo}}</p>
+            </div>
+          </div>
+          {% endfor %}
+          {% else %}
+          <h1>Sem Lançamentos no período!</h1>
+          {% endif %}
         </div>
+        <!-- Tabela minigraficos -->
+      </div>
       <div class="col">
         <h3>Orçado / Realizado</h3>
+        <!-- Gráfico orçado/realizado -->
         <div class="cartao">
           <div style="display: none;">
             <p id="valor-orc">{{orcamento.valor_orc}}</p>
@@ -94,9 +99,10 @@
             <p id="nome-grafico">{{graf_nome}}</p>
           </div>
           <canvas id="grafico" style="width:100%;max-width:400px"></canvas>
-            
         </div>
+        <!-- Gráfico orçado/realizado -->
         <h3>Lançamentos</h3>
+        <!-- Tabela de lancamentos -->
         <div class="tabela cartao">
           <table class="table table-dark table-striped">
             <tr>
@@ -118,8 +124,21 @@
             </tr>
           </table>
         </div>
+        <!-- Tabela de lancamentos -->
       </div>
     </div>
+    <div hidden>
+      {% for l in lancamento_total_mensal%}
+      <p class="total-lanc">{{l.total}}</p>
+      {% endfor %}
+      {% for o in orcamento_total_mensal%}
+      <p class="total-orc">{{o.total}}</p>
+      {% endfor %}
+    </div>
+    <!-- Grafico Orçamento -->
+    <div class="row cartao">
+      <canvas id="myChart"></canvas>
+    </div>
   </div>
-<script src="{% static 'js/exibe.js'%}"></script>
+  <script src="{% static 'js/exibe.js'%}"></script>
     {% endblock %}
