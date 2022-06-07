@@ -1,6 +1,5 @@
 import datetime
 from django.shortcuts import render
-from orcamento.forms import LancamentoForm, CategoriaForm
 from openpyxl import load_workbook
 from orcamento.models import Categoria, Lancamento, Orcamento
 from django.db.models.aggregates import Sum
@@ -113,33 +112,37 @@ def cadastra_orcamento(request):
 def exibir(item_indice, mes_sel):
     lancamentos_exibir = Lancamento.objects.filter(categoria__id = item_indice, data_pagamento__month = mes_sel)                              
     orcamentos = Orcamento.objects.filter(categoria__id = item_indice, data_orcamento__month = mes_sel)
-    resumo_categoria = Lancamento.objects.filter(data_pagamento__month = mes_sel).values('categoria__nome').annotate(soma = Sum('valor_pago')).order_by('categoria__nome')
     lancamento_total_mensal = Lancamento.objects.filter(data_pagamento__year = 2022).values('data_pagamento__month').annotate(total=Sum('valor_pago')).order_by('data_pagamento__month')
     orcamento_total_mensal = Orcamento.objects.filter(data_orcamento__year = 2022).values('data_orcamento__month').annotate(total=Sum('valor_orc')).order_by('data_orcamento__month')
+    categorias = Categoria.objects.all().order_by('nome')
     
     lista_orcamento = []
-    for t in resumo_categoria:
-        orc = Orcamento.objects.all().filter(categoria__nome = t['categoria__nome'], data_orcamento__month = mes_sel)
-        nome_orc = t['categoria__nome']
-        cat_obj = Categoria.objects.get(nome = nome_orc)
-        indice = cat_obj.id
-        valor_orc = 0
-        uso = 0
-        uso_perc = 0
-        saldo = 0 - t['soma']
-        saldo = round(saldo,2)
-        total = t['soma']
-        if len(orc) > 0:
-            valor_orc = orc[0].valor_orc
+    
+    for c in categorias:
+        l = Lancamento.objects.filter(categoria_id = c.id, data_pagamento__month = mes_sel,
+        ).values('categoria__nome').annotate(soma=Sum('valor_pago'))
+        o = Orcamento.objects.filter(categoria_id = c.id, data_orcamento__month = mes_sel,
+        ).values('categoria__nome').annotate(soma=Sum('valor_orc'))
 
-        if valor_orc > 0:
-            uso = t['soma'] / valor_orc
-            uso_perc = uso * 100
-            uso_perc = round(uso_perc, 2)
-            saldo = valor_orc - t['soma']
-            saldo = round(saldo, 2)
-        orcamento = {'nome':nome_orc, 'uso': uso, 'saldo':saldo, 'total': total, 'uso_perc':uso_perc, 'indice':indice, 'mes':mes_sel}
-        lista_orcamento.append(orcamento)
+        nome = c.nome
+        if l:
+            lanc_soma = round(float(l[0]['soma']),2)
+        else:
+            lanc_soma = 0
+
+        if o:
+            orc_valor = round(float(o[0]['soma']),2)
+        else:
+            orc_valor = 0
+        
+        if orc_valor == 0:
+            uso = 's/ orçamento'
+        else:
+            uso = round((lanc_soma/orc_valor*100),2)
+        saldo = round((orc_valor - lanc_soma),2)
+        dados = {'nome':nome, 'saldo':saldo, 'uso_perc':uso, 'total':lanc_soma, 'indice':c.id, 'mes':mes_sel}
+
+        lista_orcamento.append(dados)
         
     
     if len(orcamentos) > 0:
@@ -147,23 +150,21 @@ def exibir(item_indice, mes_sel):
     else:
         orc = {'valor_orc': 0 }
 
-    if len(lancamentos_exibir) > 0:
-        graf_nome = lancamentos_exibir[0].categoria.nome
-    else:
-        graf_nome = ''
+
+    graf_nome = categorias.filter(pk = item_indice).first().nome
 
     soma_lista = 0
 
     for item_lista in lista_orcamento:
-        if item_lista['nome'] == lancamentos_exibir[0].categoria.nome:
-            soma_lista = round(item_lista['total'],2)
+        if lancamentos_exibir:
+            if item_lista['nome'] == lancamentos_exibir[0].categoria.nome:
+                soma_lista = round(item_lista['total'],2)
 
 
     context = {
         'lancamentos': lancamentos_exibir,
         'soma': soma_lista,
         'graf_nome': graf_nome,
-        'resumo_categoria':resumo_categoria,
         'orcamento' : orc,
         'lista_orcamento' : lista_orcamento,
         'lancamento_total_mensal' : lancamento_total_mensal,

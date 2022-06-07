@@ -35,6 +35,16 @@ body {
     font-size: 0.6rem;
     
   }
+
+  .rotulo {
+    font-weight: 800;
+  }
+
+
+  .saldo {
+    text-align: end;
+    padding-right: 5%;
+  }
   
   th, td {
     text-align: left;

@@ -50,36 +50,34 @@
     <!-- navbar -->
     {% endif %}
     <div class="row">
-      <div class="col-7">
+      <div class="col">
         <h3>Orçamento</h3>
         <!-- Tabela minigraficos -->
         <div class="cartao">
           <div class="row" style="margin-top: 3px; height: 24px;">
-            <div class="col-6" style="font-weight: bold;">
-              <p>Categoria</p>
+            <div class="col-7">
+              <p class="rotulo">Categoria</p>
             </div>
-            <div class="col-md-auto">
-              <div style="width: 100px; text-align: center; font-weight: bold;">
-                <p>Uso</p>
-              </div>
+            <div class="col-2">
+                <p class="rotulo">Uso</p>
             </div>
-            <div class="col-md-auto" style="font-weight: bold;">
-              <p>Saldo</p>
+            <div class="col-3">
+              <p class="rotulo saldo">Saldo R$</p>
             </div>
           </div>
           {% if lista_orcamento %}
           {% for item in lista_orcamento %}
           <div class="row" style="margin-top: 3px; height: 24px;">
-            <div class="col-6">
+            <div class="col-7">
               <a class="link" href="{% url 'exibe_lancamentos2' var1=item.indice var2=item.mes %}">{{item.nome}}</a>
             </div>
-            <div class="col-md-auto">
+            <div class="col-2">
               <div class = "mini-grafico">
                 <p>{{item.uso_perc}}</p>
               </div>
             </div>
-            <div class="col-md-auto">
-              <p>R${{item.saldo}}</p>
+            <div class="col-3">
+              <p class="saldo">{{item.saldo}}</p>
             </div>
           </div>
           {% endfor %}
@@ -139,6 +137,9 @@
     <div class="row cartao">
       <canvas id="myChart"></canvas>
     </div>
+  </div>
+  <div style="display: none;">
+  <input type="text" id="mes" value="{{lista_orcamento.0.mes}}">
   </div>
   <script src="{% static 'js/exibe.js'%}"></script>
     {% endblock %}

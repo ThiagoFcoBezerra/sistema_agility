@@ -1,4 +1,4 @@
-
+clicado();
 grandeGrafico();
 miniGraficos();
 graficoAnual();
@@ -96,4 +96,15 @@ function graficoAnual(){
         document.getElementById('myChart'),
         config
       );   
+}
+
+function clicado(){
+  const mesSelecionado = document.querySelector("#mes")
+  const menuMes = document.querySelectorAll(".link")
+  for(let i = 0; i <= menuMes.length; i++){
+    if(mesSelecionado.value == i){
+      menuMes[i-1].classList.add("clicado");
+    }
+  }
+    
 }
