@@ -22,9 +22,11 @@ def testa_arquivo(request):
 
     for data in ws['N']:
         if data.value != 'Data de pagamento':
-            lancamentos_a_excluir = Lancamento.objects.filter(data_pagamento = data.value)
+            print(data.value.strftime("%m"))
+            lancamentos_a_excluir = Lancamento.objects.filter(data_pagamento__month = data.value.strftime("%m"))
             for lancamento in lancamentos_a_excluir:
                 lancamento.delete()
+            break
     
     for cell1, cell2, cell3, cell4 in zip(ws['C'], ws['D'], ws['G'], ws['N']):
         if type(cell3.value) == type(3.14) and cell1.value != None and cell2.value != None and cell4.value != None:
