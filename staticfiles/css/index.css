@@ -1,0 +1,10 @@
+@keyframes grafico {
+	from {stroke-dashoffset: 189;}
+	to {stroke-dashoffset: 0;}			
+	}
+
+svg :nth-child(2) {
+	animation-name: grafico;
+	animation-duration: 2s;
+			
+	}
