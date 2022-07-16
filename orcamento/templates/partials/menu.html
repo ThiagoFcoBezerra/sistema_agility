@@ -1,0 +1,50 @@
+<div class="container p-0 mb-2">
+    <!-- inicio navbar -->
+        <nav class="navbar navbar-expand-lg bg-light navbar-dark bg-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">Agility</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="{% url 'index'%}">Home</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Financeiro</a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="recebimento.html">Recebimentos</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'testa_arquivo' %}">Pagamentos</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="orcamento.html">Orçamentos</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="lista_autorizacoes.html">Autorizações</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <div class=" d-flex m-0 p-0">
+                        <button class="btn border border-light position-relative" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight"><i class="bi bi-bell text-white"></i>
+                        </button>
+                        <span class="position-relative bottom-100 start-0 translate-middle badge border border-light rounded-circle bg-danger p-2 my-auto"><span class="visually-hidden">unread messages</span></span>
+                    </div>
+                    {% if request.user.is_authenticated %}
+                    <div class="d-flex justify-content-end text-white ms-2" style="min-height: 24px"> 
+                        <span>Olá, {{request.user}}</span><a href="#"><a href="{% url 'logout' %}"><i class="bi bi-box-arrow-right  text-white m-1"></i></a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </nav>
+    <!-- final navbar -->
+    </div>
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasRightLabel">Pendentes de análises</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <a href="autorizacoes.html"><h5>Equipamentos Compras Novas</h5></a>
+        </div>
+    </div>

@@ -1,4 +1,5 @@
 import datetime
+from xml.etree.ElementTree import tostring
 from django.shortcuts import render
 from openpyxl import load_workbook
 from orcamento.models import Categoria, Lancamento, Orcamento
@@ -6,43 +7,111 @@ from django.db.models.aggregates import Sum
 from django.contrib.auth.decorators import login_required
 
 # Create your views here.
-
+@login_required
 def index(request):
+    if request.method == 'POST':
+        data_selecionada = request.POST['data']
+        ano = data_selecionada[0:4]
+        mes = data_selecionada[5:]
+    else:
+        data = datetime.datetime.now()
+        ano = data.strftime("%Y")
+        mes = data.strftime("%m")
+        data_selecionada = f'{ano}-{mes}'
+    
+    lancamento_total_anual = Lancamento.objects.filter(data_pagamento__year = ano).values('data_pagamento__year').annotate(total=Sum('valor_pago'))
+    orcamento_total_anual = Orcamento.objects.filter(data_orcamento__year = ano).values('data_orcamento__year').annotate(total=Sum('valor_orc'))
+    lancamento_total_mensal = Lancamento.objects.filter(data_pagamento__month = mes).values('data_pagamento__month').annotate(total=Sum('valor_pago'))
+    orcamento_total_mensal = Orcamento.objects.filter(data_orcamento__month = mes).values('data_orcamento__month').annotate(total=Sum('valor_orc'))
+    categorias = Categoria.objects.all().order_by('nome')
 
-    return render(request, 'index.html')
+    lista_dados_orc = []
+    for categoria in categorias:
+        lanc_mensal = Lancamento.objects.filter(categoria = categoria, data_pagamento__month = mes).values('categoria').annotate(total=Sum('valor_pago'))
+        if len(lanc_mensal) == 0:
+            lanc_mensal_valor = 0
+        else:
+            lanc_mensal_valor = round(lanc_mensal[0]['total'],2)
+
+        orc_mensal = Orcamento.objects.filter(categoria = categoria, data_orcamento__month = mes).values('categoria').annotate(total=Sum('valor_orc'))
+        if len(orc_mensal) == 0:
+            orc_mensal_valor = 0
+        else:
+            orc_mensal_valor = round(orc_mensal[0]['total'],2)
+        
+        lanc_anual = Lancamento.objects.filter(categoria = categoria, data_pagamento__year = ano).values('categoria').annotate(total=Sum('valor_pago'))
+        if len(lanc_anual) == 0:
+            lanc_anual_valor = 0
+        else:
+            lanc_anual_valor = round(lanc_anual[0]['total'],2)
+
+        orc_anual = Orcamento.objects.filter(categoria = categoria, data_orcamento__year = ano).values('categoria').annotate(total=Sum('valor_orc'))
+        if len(orc_anual) == 0:
+            orc_anual_valor = 0
+        else:
+            orc_anual_valor = round(orc_anual[0]['total'],2)
+        dados_orc = {
+                    'categoria_id': categoria.id,
+                    'nome':categoria.nome,
+                    'lanc_mensal_valor':lanc_mensal_valor,
+                    'orc_mensal_valor':orc_mensal_valor,
+                    'lanc_anual_valor':lanc_anual_valor,
+                    'orc_anual_valor':orc_anual_valor
+                    }
+        lista_dados_orc.append(dados_orc)
+
+    if len(lancamento_total_anual) == 0 or len(orcamento_total_anual) == 0:
+        uso_anual = '0%'
+    else:
+        uso_anual = f"{round(lancamento_total_anual[0]['total'] / orcamento_total_anual[0]['total'] * 100,2)}%"
+    
+    if len(lancamento_total_mensal) == 0 or len(orcamento_total_mensal) == 0:
+        uso_mensal = '0%'
+    else:
+        uso_mensal = f"{round(lancamento_total_mensal[0]['total'] / orcamento_total_mensal[0]['total'] * 100,2)}%"
+
+    dados = {
+        'lista_dados_orc':lista_dados_orc,
+        'uso_anual': uso_anual,
+        'uso_mensal': uso_mensal,
+        'data' : data_selecionada,
+        'mes':mes
+    }
+    return render(request, 'index.html', dados)
 
 @login_required
 def testa_arquivo(request):
-    arquivo_teste = request.FILES['arquivo']
-    mes = request.POST['mes']
+    if request.method == 'POST':
+        arquivo_teste = request.FILES['arquivo']
+        mes = request.POST['mes']
 
-    wb = load_workbook(arquivo_teste)
+        wb = load_workbook(arquivo_teste)
 
-    ws = wb.get_sheet_by_name(mes)
+        ws = wb.get_sheet_by_name(mes)
 
-    for data in ws['N']:
-        if data.value != 'Data de pagamento':
-            print(data.value.strftime("%m"))
-            lancamentos_a_excluir = Lancamento.objects.filter(data_pagamento__month = data.value.strftime("%m"))
-            for lancamento in lancamentos_a_excluir:
-                lancamento.delete()
-            break
-    
-    for cell1, cell2, cell3, cell4 in zip(ws['C'], ws['D'], ws['G'], ws['N']):
-        if type(cell3.value) == type(3.14) and cell1.value != None and cell2.value != None and cell4.value != None:
+        for data in ws['N']:
+            if data.value != 'Data de pagamento':
+                print(data.value.strftime("%m"))
+                lancamentos_a_excluir = Lancamento.objects.filter(data_pagamento__month = data.value.strftime("%m"))
+                for lancamento in lancamentos_a_excluir:
+                    lancamento.delete()
+                break
+        
+        for cell1, cell2, cell3, cell4 in zip(ws['C'], ws['D'], ws['G'], ws['N']):
+            if type(cell3.value) == type(3.14) and cell1.value != None and cell2.value != None and cell4.value != None:
+                
+                cat = Categoria.objects.filter(nome = cell1.value)
+                
+                if not cat:
+                    categoria = Categoria.objects.create(nome = cell1.value)
+                else:
+                    categoria = cat[0]
+                
+                valor_pago = round(cell3.value,2) 
+                lanca = Lancamento.objects.create(categoria = categoria, descricao = cell2.value, valor_pago = valor_pago, data_pagamento = cell4.value)
+                lanca.save()
             
-            cat = Categoria.objects.filter(nome = cell1.value)
-            
-            if not cat:
-                categoria = Categoria.objects.create(nome = cell1.value)
-            else:
-                categoria = cat[0]
-            
-            valor_pago = round(cell3.value,2) 
-            lanca = Lancamento.objects.create(categoria = categoria, descricao = cell2.value, valor_pago = valor_pago, data_pagamento = cell4.value)
-            lanca.save()
-            
-    return render(request, 'index.html')
+    return render(request, 'atualiza_lancamentos.html')
 
 @login_required
 def exibir_lancamentos(request):
@@ -174,3 +243,36 @@ def exibir(item_indice, mes_sel):
         }
     
     return context
+
+def detalhes(request, id, m):
+    if request.method == 'POST':
+        data_selecionada = request.POST['data']
+        ano = data_selecionada[0:4]
+        mes = data_selecionada[5:]
+        cat_id = id
+    else:
+        data = datetime.datetime.now()
+        ano = data.strftime("%Y")
+        cat_id = id
+        mes = m
+        if m < 10:
+            mes = f'0{m}'
+        data_selecionada = f'{ano}-{mes}'
+
+    categorias = Categoria.objects.all().order_by('nome')
+    categoria = categorias.get(pk = cat_id)
+    lancamentos_a_exibir = Lancamento.objects.filter(categoria__id = id, data_pagamento__month = mes)
+    lancamento_total_mensal = Lancamento.objects.filter(categoria__id = id, data_pagamento__year = ano).values('data_pagamento__month').annotate(total=Sum('valor_pago'))
+    orcamento_total_mensal = Orcamento.objects.filter(categoria__id = id, data_orcamento__year = ano).values('data_orcamento__month').annotate(total=Sum('valor_orc'))
+
+    dados = {
+        'mes': mes,
+        'categorias':categorias,
+        'data_selecionada':data_selecionada,
+        'categoria': categoria,
+        'id':cat_id,
+        'lancamentos_a_exibir':lancamentos_a_exibir,
+        'lancamento_total_mensal':lancamento_total_mensal,
+        'orcamento_total_mensal':orcamento_total_mensal,
+    }
+    return render(request, 'detalhes.html', dados)
