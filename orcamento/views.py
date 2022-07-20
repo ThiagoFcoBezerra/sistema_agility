@@ -262,8 +262,8 @@ def detalhes(request, id, m):
     categorias = Categoria.objects.all().order_by('nome')
     categoria = categorias.get(pk = cat_id)
     lancamentos_a_exibir = Lancamento.objects.filter(categoria__id = id, data_pagamento__month = mes)
-    lancamento_total_mensal = Lancamento.objects.filter(categoria__id = id, data_pagamento__year = ano).values('data_pagamento__month').annotate(total=Sum('valor_pago'))
-    orcamento_total_mensal = Orcamento.objects.filter(categoria__id = id, data_orcamento__year = ano).values('data_orcamento__month').annotate(total=Sum('valor_orc'))
+    lancamento_total_mensal = Lancamento.objects.filter(categoria__id = id, data_pagamento__year = ano).values('data_pagamento__month').annotate(total=Sum('valor_pago')).order_by('data_pagamento__month')
+    orcamento_total_mensal = Orcamento.objects.filter(categoria__id = id, data_orcamento__year = ano).values('data_orcamento__month').annotate(total=Sum('valor_orc')).order_by('data_orcamento__month')
 
     dados = {
         'mes': mes,
