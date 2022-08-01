@@ -27,6 +27,9 @@ class Orcamento(models.Model):
     def __str__(self):
         return f'{self.categoria.nome} - {self.descricao}'
 
+class Faturamento(models.Model):
+    faturamento_data = models.DateField()
+    faturamento_valor = models.DecimalField(max_digits=10, decimal_places=2)
 
-
-
+    def __str__(self):
+        return f'{self.faturamento_data} - {self.faturamento_valor}'

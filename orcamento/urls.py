@@ -10,4 +10,9 @@ urlpatterns = [
     path('<int:var1>', views.orcamento, name='orcamento'),
     path('cadastra_orcamento', views.cadastra_orcamento, name='cadastra_orcamento'),
     path('detalhes/<int:id>/<int:m>', views.detalhes, name='detalhes'),
+    path('cadastra_faturamento', views.cadastra_faturamento, name='cadastra_faturamento'),
+    path('resultado',views.resultado, name='resultado'),
+    path('exclui_faturamento/<int:id>',views.exclui_faturamento, name='exclui_faturamento'),
+    path('atualiza_faturamento/<int:id>', views.atualiza_faturamento, name='atualiza_faturamento'),
+
 ]

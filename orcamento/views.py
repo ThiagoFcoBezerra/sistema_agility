@@ -1,8 +1,7 @@
 import datetime
-from xml.etree.ElementTree import tostring
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from openpyxl import load_workbook
-from orcamento.models import Categoria, Lancamento, Orcamento
+from orcamento.models import Categoria, Lancamento, Orcamento, Faturamento
 from django.db.models.aggregates import Sum
 from django.contrib.auth.decorators import login_required
 
@@ -180,6 +179,7 @@ def cadastra_orcamento(request):
 
     return render(request, 'index.html')
 
+
 def exibir(item_indice, mes_sel):
     lancamentos_exibir = Lancamento.objects.filter(categoria__id = item_indice, data_pagamento__month = mes_sel)                              
     orcamentos = Orcamento.objects.filter(categoria__id = item_indice, data_orcamento__month = mes_sel)
@@ -244,7 +244,9 @@ def exibir(item_indice, mes_sel):
     
     return context
 
+@login_required
 def detalhes(request, id, m):
+
     if request.method == 'POST':
         data_selecionada = request.POST['data']
         ano = data_selecionada[0:4]
@@ -276,3 +278,62 @@ def detalhes(request, id, m):
         'orcamento_total_mensal':orcamento_total_mensal,
     }
     return render(request, 'detalhes.html', dados)
+
+@login_required
+def cadastra_faturamento(request):
+    if request.method == 'POST':
+        data = request.POST['data']
+        valor = request.POST['valor']
+
+        Faturamento.objects.create(faturamento_data = data, faturamento_valor = valor)
+    
+    return redirect('resultado')
+
+@login_required
+def resultado(request):
+    if request.method == 'POST':
+        data_selecionada = request.POST['data_sel']
+        ano = data_selecionada[0:4]
+        mes = data_selecionada[5:]
+    else:
+        data = datetime.datetime.now()
+        ano = data.strftime("%Y")
+        mes = data.strftime("%m")
+    data_selecionada = f'{ano}-{mes}'
+
+    faturamentos = Faturamento.objects.filter(faturamento_data__month = mes, faturamento_data__year = ano).order_by('faturamento_data')
+    fat_dia = Faturamento.objects.filter(faturamento_data__month = mes, faturamento_data__year = ano).values('faturamento_data__day').annotate(total=Sum('faturamento_valor')).order_by('faturamento_data__day')
+    fat_mes = Faturamento.objects.filter(faturamento_data__year = ano).values('faturamento_data__month').annotate(total=Sum('faturamento_valor')).order_by('faturamento_data__month')
+    pag_dia = Lancamento.objects.filter(data_pagamento__month = mes, data_pagamento__year = ano).values('data_pagamento__day').annotate(total=Sum('valor_pago')).order_by('data_pagamento__day')
+    pag_mes = Lancamento.objects.filter(data_pagamento__year = ano).values('data_pagamento__month').annotate(total=Sum('valor_pago')).order_by('data_pagamento__month')
+
+    dados = {
+        'faturamentos':faturamentos,
+        'fat_dia':fat_dia,
+        'fat_mes':fat_mes,
+        'pag_dia':pag_dia,
+        'pag_mes':pag_mes,
+        'data_selecionada':data_selecionada,
+    }
+
+    return render(request, 'resultado.html', dados)
+
+@login_required
+def exclui_faturamento(request, id):
+    faturamento = Faturamento.objects.get(pk = id)
+    faturamento.delete()
+
+    return redirect('resultado')
+
+@login_required
+def atualiza_faturamento(request, id):
+    if request.method == 'POST':
+        data = request.POST['data']
+        valor = request.POST['valor']
+
+        faturamento = Faturamento.objects.get(pk=id)
+        faturamento.faturamento_data = data
+        faturamento.faturamento_valor = valor
+
+        faturamento.save() 
+    return redirect('resultado')
