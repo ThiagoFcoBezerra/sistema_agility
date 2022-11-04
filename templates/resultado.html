@@ -8,69 +8,73 @@
     <!-- Modal2 -->
     <div class="modal fade" id="exampleModal2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Novo Faturamento</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-            <form action="cadastra_faturamento" method="POST">
-                {% csrf_token %}
-                <div class="mb-3">
-                    <label for="data" class="form-label">Data</label>
-                    <input type="date" class="form-control" id="data" name="data">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Novo Faturamento</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="mb-3">
-                    <label for="valor" class="form-label">Valor</label>
-                    <input type="number" step="0.01" class="form-control" id="valor" name="valor">
+                <div class="modal-body">
+                    <form action="cadastra_faturamento" method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="data" class="form-label">Data</label>
+                            <input type="date" class="form-control" id="data" name="data">
+                        </div>
+                        <div class="mb-3">
+                            <label for="valor" class="form-label">Valor</label>
+                            <input type="number" step="0.01" class="form-control" id="valor" name="valor">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">Salvar</button>
+                        </div>
+                    </form>	
                 </div>
             </div>
-            <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-            <button type="submit" class="btn btn-primary">Salvar</button>
-            </div>
-                </form>	
-        </div>
         </div>
     </div>
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Recebimento</li>
+            <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Recebimento</li>
         </ol>
     </nav>
-    <div class="container">
-        <div class="col border border-dark p-3">
+    <div class="container-fluid">
+        <div class="row border border-dark p-3 mx-1">
             <div class="d-flex">
                 <h3 class="me-auto">Faturamento</h3>
                 <button type="button" class="btn btn-primary my-auto ms-2 btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal2">
                     <i class="bi bi-coin"></i><span class="ms-2 d-none d-lg-inline">Novo Faturamento</span>
                 </button>					
             </div>
-                <div class="rows border border-dark mb-3">
-                    <form method="POST">
-                        {% csrf_token %}
-                        <div class="row p-3">
-                            <div class="col col-auto">
-                                <label class="form-label">Selecione o período</label>
-                            </div>
-                            <div class="col col-md-4">
-                                <input type="month" class="form-control" name="data_sel" value="{{data_selecionada}}">
-                            </div>
-                            <div class="col">
-                                <input type="submit" class="btn btn-primary">
-                            </div>
+            <div class="row border border-dark mb-3">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="row p-3">
+                        <div class="col col-auto">
+                            <label class="form-label">Selecione o período</label>
                         </div>
-                    </form>
-                </div>
-
-            <div class="rows border border-dark mb-3">
-                <canvas id="faturamento-anual" width="400" height="100"></canvas>
+                        <div class="col col-md-4">
+                            <input type="month" class="form-control" name="data_sel" value="{{data_selecionada}}">
+                        </div>
+                        <div class="col">
+                            <input type="submit" class="btn btn-primary">
+                        </div>
+                    </div>
+                </form>
             </div>
-            <div class="rows border border-dark">
+            <div class="row p-0">
+                <div class="col border border-dark mb-3 me-1">
+                    teste
+                </div>
+                <div class="col border border-dark mb-3 ms-1">
+                    <canvas id="faturamento-anual" width="100" height="50"></canvas>
+                </div>
+            </div>
+            <div class="row border border-dark">
                 <canvas id="faturamento-diario" width="400" height="100"></canvas>
             </div>
-            <div class="rows border border-dark">
+            <div class="row border border-dark">
                 {% for fat in faturamentos %}
                 <form action="atualiza_faturamento/{{fat.id}}" method="POST">
                     {% csrf_token %}
@@ -93,10 +97,8 @@
             </div>
         </div>
     </div>
-
-
-            {% include 'partials/footer.html' %}
-            <!-- final principal-->
+    {% include 'partials/footer.html' %}
+    <!-- final principal-->
 </div>
 <div class="d-none">
     {% for f in fat_dia %}
@@ -127,8 +129,7 @@
     </div>
     {% endfor %}    
 </div>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-	<script src="{% static 'js/recebimento.js' %}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
-		{% endblock %}
-  
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static 'js/recebimento.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+{% endblock %}

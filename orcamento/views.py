@@ -179,7 +179,7 @@ def cadastra_orcamento(request):
 
     return render(request, 'index.html')
 
-
+@login_required
 def exibir(item_indice, mes_sel):
     lancamentos_exibir = Lancamento.objects.filter(categoria__id = item_indice, data_pagamento__month = mes_sel)                              
     orcamentos = Orcamento.objects.filter(categoria__id = item_indice, data_orcamento__month = mes_sel)

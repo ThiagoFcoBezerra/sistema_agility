@@ -23,6 +23,18 @@
                                 <li><a class="dropdown-item" href="lista_autorizacoes.html">Autorizações</a></li>-->
                             </ul>
                         </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Gerenciamento</a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="{% url 'usuarios' %}">Usuários</a></li>
+                                <li><hr class="dropdown-divider">
+                                <li><a class="dropdown-item" href="{% url 'login' %}">Sair</a></li>
+                                <!--<li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="orcamento.html">Orçamentos</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="lista_autorizacoes.html">Autorizações</a></li>-->
+                            </ul>
+                        </li>
                     </ul>
                     <div class=" d-flex m-0 p-0">
                         <button class="btn border border-light position-relative" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight"><i class="bi bi-bell text-white"></i>
@@ -31,7 +43,7 @@
                     </div>
                     {% if request.user.is_authenticated %}
                     <div class="d-flex justify-content-end text-white ms-2" style="min-height: 24px"> 
-                        <span>Olá, {{request.user}}</span><a href="#"><a href="{% url 'logout' %}"><i class="bi bi-box-arrow-right  text-white m-1"></i></a>
+                        <span>Olá, {{request.user}}</span><a href="{% url 'logout' %}"><i class="bi bi-box-arrow-right  text-white m-1"></i></a>
                     </div>
                     {% endif %}
                 </div>

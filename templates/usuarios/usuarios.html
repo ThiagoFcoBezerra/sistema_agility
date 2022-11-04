@@ -1,0 +1,63 @@
+{% extends 'base2.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container bg-secondary bg-opacity-25 p-0">
+    {% include 'partials/menu.html' %}
+    <div class="p-3">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item active" aria-current="page">Home</li>
+                <li class="breadcrumb-item" aria-current="page">Usuários</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="border border-dark vh-100 m-3 rounded p-3">
+        <div class="d-flex justify-content-between py-2">
+            <h2>Usuários</h2>
+            <a class="btn btn-primary my-auto" href="{% url 'cadastro' %}" role="button">
+                <i class="bi bi-coin"></i><span class="ms-2 d-none d-lg-inline">Novo Usuário</span>
+            </a>
+        </div>
+        <div class="border border-dark rounded p-3">
+            <form action="{% url 'usuarios' %}">
+                <div class="input-group w-50 mx-auto">
+                    <input type="text" class="form-control" placeholder="Pesquisar usuários" aria-label="Recipient's username" aria-describedby="button-addon2" name="busca">
+                    <button class="btn btn-outline-primary" type="submit" id="button-addon2">Buscar</button>
+                </div>
+            </form>
+        </div>
+        <div>
+            <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">Nome</th>
+                    <th scope="col">Sobrenome</th>
+                    <th scope="col">Usuário</th>
+                    <th scope="col">E-mail</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for usuario in usuarios %}
+                  <tr>
+                    <td>{{usuario.first_name}}</td>
+                    <td>{{usuario.last_name}}</td>
+                    <td>{{usuario.username}}</td>
+                    <td>{{usuario.email}}</td>
+                    <td>
+                        <div class="btn-group">
+                            <a href="{% url 'exclui_usuario' id=usuario.id %}" class="btn btn-danger">Excluir</a>
+                            <a href="#" class="btn btn-success">Editar</a>
+                        </div>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+        </div>
+    </div>
+    {% include 'partials/footer.html' %}
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+{% endblock %}
