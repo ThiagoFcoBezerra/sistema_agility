@@ -1,16 +1,56 @@
-graficos();
+const listaFatDiario = document.querySelectorAll('.fat-dia');
+const listaFatMensal = document.querySelectorAll('.fat-mes');
+const listaPagMensal = document.querySelectorAll('.pag-mes');
+
+const fatDiarioDados = capturaDados(listaFatDiario);
+const fatMensalDados = capturaDados(listaFatMensal);
+const pagMensalDados = capturaDados(listaPagMensal);
+
+graficos(fatDiarioDados, fatMensalDados, pagMensalDados);
 corrigeDados();
+carregaTabela(fatMensalDados, pagMensalDados);
 
-function graficos(){
+function carregaTabela(fatMensal, pagMensal) {
+    const tabelaResultado = document.querySelector(".tabela-resultado").querySelectorAll("tr");
 
-    const listaFatDiario = document.querySelectorAll('.fat-dia');
-    const listaFatMensal = document.querySelectorAll('.fat-mes');
-    const listaPagMensal = document.querySelectorAll('.pag-mes');
-
-    const fatDiarioDados = capturaDados(listaFatDiario);
-    const fatMensalDados = capturaDados(listaFatMensal);
-    const pagMensalDados = capturaDados(listaPagMensal);
     const resultadoMensal = [];
+
+    for (let i = 0; i < fatMensal['valores'].length; i++) {
+        if (i < pagMensal['valores'].length){
+            let resultado = fatMensal['valores'][i] - pagMensal['valores'][i];
+            resultadoMensal.push(resultado);
+        }
+    }
+
+    for (let i = 0; i < fatMensal['valores'].length; i++) {
+        const faturamento = fatMensal['valores'][i];
+        tabelaResultado[i+1].children[1].innerText = parseFloat(faturamento).toLocaleString("pt-BR", {style:"currency", currency:"BRL"});
+        
+    }  
+
+    for (let i = 0; i < pagMensal['valores'].length; i++) {
+        const desembolso = pagMensal['valores'][i];
+        tabelaResultado[i+1].children[2].innerText = parseFloat(desembolso).toLocaleString("pt-BR", {style:"currency", currency:"BRL"});
+        
+    } 
+    
+    let valor = 0;
+
+    for (let i = 0; i < resultadoMensal.length; i++) {
+        
+        valor = valor + resultadoMensal[i];
+        tabelaResultado[i+1].children[4].innerText = valor.toLocaleString("pt-BR", {style:"currency", currency:"BRL"});
+        
+        const resultado = resultadoMensal[i];
+        tabelaResultado[i+1].children[3].innerText = resultado.toLocaleString("pt-BR", {style:"currency", currency:"BRL"});
+                
+    }  
+}
+
+function graficos(fatDiarioDados, fatMensalDados, pagMensalDados){
+
+    const resultadoMensal = [];
+    const saldoAcumulado = [];
 
     for (let i = 0; i < fatMensalDados['valores'].length; i++) {
         if (i < pagMensalDados['valores'].length){
@@ -18,7 +58,12 @@ function graficos(){
             resultadoMensal.push(resultado);
         }
     }
-    
+    let saldo =0;
+    for (let i = 0; i < resultadoMensal.length; i++) {
+        saldo = saldo + resultadoMensal[i];
+        saldoAcumulado.push(saldo);
+        
+    }
     const ctx1 = document.getElementById('faturamento-diario').getContext('2d');
     const ChartDiario = new Chart(ctx1, {
         type: 'bar',
@@ -74,14 +119,26 @@ function graficos(){
                 borderWidth: 1
             },
             {
+                type: 'line',
+                label: 'Saldo',
+                data: saldoAcumulado,
+                backgroundColor: [
+                    'rgba(50, 200, 100, 0.2)',
+                ],
+                borderColor: [
+                    'rgba(50, 200, 100, 1)',
+                ],
+                borderWidth: 1
+            },
+            {
                 type: 'bar',
                 label: 'Resultado',
                 data: resultadoMensal,
                 backgroundColor: [
-                    'rgba(50, 250, 100, 0.2)',
+                    'rgba(150, 150, 150, 0.2)',
                 ],
                 borderColor: [
-                    'rgba(50, 250, 100, 1)',
+                    'rgba(150, 150, 150, 1)',
                 ],
                 borderWidth: 1
             }]

@@ -134,7 +134,14 @@ def orcamento(request, var1):
     else:
         mes_buscado = var1
 
+    d = datetime.date(2022, mes_buscado, 31)
     categorias = Categoria.objects.all().order_by('nome')
+    orc = Orcamento.objects.filter(data_orcamento__month = mes_buscado)
+    for cat in categorias:
+        t = orc.filter(categoria = cat)
+        if not t:
+            Orcamento.objects.create(categoria = cat, valor_orc = 0, data_orcamento = d)
+
     orcamentos = Orcamento.objects.filter(data_orcamento__month = mes_buscado).values('categoria__nome').annotate(soma = Sum('valor_orc')).order_by('categoria__nome')
     
     for orcamento in orcamentos:
