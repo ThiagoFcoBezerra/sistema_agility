@@ -37,34 +37,24 @@
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel">Autorização de Despesas</h5>
+              <h5 class="modal-title" id="exampleModalLabel">{{categoria.nome}}</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              <form action="detalhes.html" method="get">
+              <form action="{% url 'cria_autorizacao' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="id" value="{{categoria.id}}">
                   <div class="mb-3">
                     <label for="data" class="form-label">Data</label>
                     <input type="text" class="form-control" id="data" readonly="">
                   </div>
                   <div class="mb-3">
                     <label for="justificativa" class="form-label">Justificativa</label>
-                    <textarea class="form-control" id="justificativa" rows="3"></textarea>
+                    <textarea class="form-control" id="justificativa" rows="3" name="justificativa"></textarea>
                   </div>
                   <div class="mb-3">
                     <label for="valor" class="form-label">Valor</label>
-                    <input type="number" class="form-control" id="valor">
-                  </div>
-                  <div class="form-check">
-                    <input class="form-check-input" type="radio" name="prioridade" id="prioridade1" value="urgente">
-                    <label class="form-check-label" for="prioridade1">
-                      Urgente
-                    </label>
-                  </div>
-                  <div class="form-check">
-                    <input class="form-check-input" type="radio" name="prioridade" id="prioridade2" value="normal">
-                    <label class="form-check-label" for="prioridade2">
-                      Normal
-                    </label>
+                    <input type="number" step="0.01" class="form-control" id="valor" name="valor">
                   </div>
             </div>
             <div class="modal-footer">

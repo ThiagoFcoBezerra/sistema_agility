@@ -1,0 +1,55 @@
+{% extends 'base2.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container bg-secondary bg-opacity-25 p-0">
+    {% include 'partials/menu.html' %}
+    <div class="container min-vh-100" style="margin-top: 5px;padding: 5px 11px 0px 11px;">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item active" aria-current="page">Home</li>
+            <li class="breadcrumb-item" aria-current="page">Autorizações</li>
+        </ol>
+    </nav>
+    <h3>Autorizações de Despesas</h3>
+    <div class="border border-dark border rounded p-3">
+        <div class="mx-auto">
+            <form action="{% url 'edita_autorizacao' %}" method="post">
+                <div class="mb-3">
+                  <label for="data" class="form-label">Código</label>
+                  <input type="text" class="form-control" id="data" value="{{autorizacao.id}}"readonly>
+                </div> 
+                <div class="mb-3">
+                  <label for="data" class="form-label">Categoria</label>
+                  <input type="text" class="form-control" id="data" value="{{autorizacao.categoria}}"readonly>
+                </div>  
+                <div class="mb-3">
+                    <label for="data" class="form-label">Data</label>
+                    <input type="text" class="form-control" id="data" value="{{autorizacao.data_criacao|date:'d/m/Y'}}"readonly>
+                </div>
+                <div class="mb-3">
+                    <label for="justificativa" class="form-label">Justificativa</label>
+                    <textarea class="form-control" id="justificativa" rows="3" name="justificativa" readonly>{{autorizacao.justificativa}}</textarea>
+                </div>
+                <div class="mb-3">
+                  <label for="valor" class="form-label">Valor</label>
+                  <input type="number" step="0.01" class="form-control" id="valor" name="valor" value="{{autorizacao.valor_autorizacao|floatformat:'2u'}}" readonly>
+                </div>
+                <div class="mb-3">
+                  <label for="data" class="form-label">Solicitante</label>
+                  <input type="text" class="form-control" id="data" value="{{autorizacao.solicitante}}" readonly>
+                </div>
+                <div class="mb-3">
+                  <label for="justificativa" class="form-label">Despacho</label>
+                  <textarea class="form-control" id="justificativa" rows="3" name="justificativa" readonly>{{autorizacao.despacho}}</textarea>
+                </div>
+                <div class="mb-3">
+                  <label for="data" class="form-label">Despachante</label>
+                  <input type="text" class="form-control" id="data" value="{{autorizacao.despachante}}" readonly>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+{% endblock %}

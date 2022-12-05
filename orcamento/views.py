@@ -1,11 +1,11 @@
 import datetime
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from openpyxl import load_workbook
-from orcamento.models import Categoria, Lancamento, Orcamento, Faturamento
+from orcamento.models import Categoria, Lancamento, Orcamento, Faturamento, Autorizacao
 from django.db.models.aggregates import Sum
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.models import User
 
-# Create your views here.
 @login_required
 def index(request):
     if request.method == 'POST':
@@ -80,18 +80,36 @@ def index(request):
 
 @login_required
 def testa_arquivo(request):
+
+    lista_meses = {
+                    "01":"Janeiro",
+                    "02":"Fevereiro",
+                    "03":"Março",
+                    "04":"Abril",
+                    "05":"Maio",
+                    "06":"Junho",
+                    "07":"Julho",
+                    "08":"Agosto",
+                    "09":"Setembro",
+                    "10":"Outubro",
+                    "11":"Novembro",
+                    "12":"Dezembro",
+                    }
+    
     if request.method == 'POST':
         arquivo_teste = request.FILES['arquivo']
         mes = request.POST['mes']
+       
+        print(mes[5:7])
 
         wb = load_workbook(arquivo_teste)
 
-        ws = wb.get_sheet_by_name(mes)
+        ws = wb.get_sheet_by_name(lista_meses[mes[5:7]])
 
         for data in ws['N']:
             if data.value != 'Data de pagamento':
                 print(data.value.strftime("%m"))
-                lancamentos_a_excluir = Lancamento.objects.filter(data_pagamento__month = data.value.strftime("%m"))
+                lancamentos_a_excluir = Lancamento.objects.filter(data_pagamento__month = data.value.strftime("%m"), data_pagamento__year = data.value.strftime("%Y"))
                 for lancamento in lancamentos_a_excluir:
                     lancamento.delete()
                 break
@@ -110,55 +128,48 @@ def testa_arquivo(request):
                 lanca = Lancamento.objects.create(categoria = categoria, descricao = cell2.value, valor_pago = valor_pago, data_pagamento = cell4.value)
                 lanca.save()
             
-    return render(request, 'atualiza_lancamentos.html')
+    return render(request, 'atualiza_lancamentos2.html')
 
 @login_required
-def exibir_lancamentos(request):
-    cat = Categoria.objects.first()
-    mes_sel = datetime.datetime.now()
-    context = exibir(cat.id, int(mes_sel.strftime("%m")))
-    return render(request, 'exibe.html', context)
-
-@login_required
-def exibir_lancamentos2(request, var1, var2):
-    item_indice = var1
-    mes_sel = var2
-    context = exibir(item_indice, mes_sel)
+def orcamento(request):
     
-    return render(request, 'exibe.html', context)
-
-@login_required
-def orcamento(request, var1):
-    if not var1:
-        mes_buscado = 1
+    data_atual = datetime.datetime.now()
+    data_buscada = f"{data_atual.strftime('%Y')}-{data_atual.strftime('%m')}"
+    if request.method == 'POST':
+        data_buscada = request.POST['mes_buscado']
+        mes_buscado = data_buscada[5:7]
+        ano_buscado = data_buscada[0:4]
     else:
-        mes_buscado = var1
+        mes_buscado = data_atual.strftime('%m')
+        ano_buscado = data_atual.strftime('%Y')
 
-    d = datetime.date(2022, mes_buscado, 31)
+
+        
     categorias = Categoria.objects.all().order_by('nome')
-    orc = Orcamento.objects.filter(data_orcamento__month = mes_buscado)
+    orc = Orcamento.objects.filter(data_orcamento__month = mes_buscado, data_orcamento__year = ano_buscado)
     for cat in categorias:
-        t = orc.filter(categoria = cat)
-        if not t:
-            Orcamento.objects.create(categoria = cat, valor_orc = 0, data_orcamento = d)
+        orcamento_existe = orc.filter(categoria = cat)
+        if not orcamento_existe:
+            Orcamento.objects.create(categoria = cat, valor_orc = 0, data_orcamento = f'{ano_buscado}-{mes_buscado}-01')
 
-    orcamentos = Orcamento.objects.filter(data_orcamento__month = mes_buscado).values('categoria__nome').annotate(soma = Sum('valor_orc')).order_by('categoria__nome')
+    orcamentos = Orcamento.objects.filter(data_orcamento__month = mes_buscado, data_orcamento__year = ano_buscado).values('categoria__nome').annotate(soma = Sum('valor_orc')).order_by('categoria__nome')
     
     for orcamento in orcamentos:
         orcamento['soma'] = float(orcamento['soma'])
         orcamento['soma'] = round(orcamento['soma'], 2)
 
     dados = {
-        'categorias' : categorias,
         'orcamentos': orcamentos,
-        'mes': var1
+        'data': data_buscada
     }
-    return render(request, 'orcamento.html', dados)
-
+    return render(request, 'orcamento2.html', dados)
+    
 @login_required
+@permission_required('orcamento.change_orcamento', raise_exception=True)
 def cadastra_orcamento(request):
-    mes = request.POST['mes']
-    mes = int(mes)
+    data = request.POST['data']
+    mes = int(data[5:7])
+    ano = int(data[0:4])
     if request.POST.get('recorrencia'):
         mes_final = 13
     else:
@@ -166,7 +177,7 @@ def cadastra_orcamento(request):
 
     for m in range(mes, mes_final):
 
-        data = f'2022-{m}-01'
+        data = f'{ano}-{m}-01'
         
         for cat, desc, valor in zip(request.POST.getlist('categoria'), request.POST.getlist('descricao'), request.POST.getlist('valor')):
             valor = valor.replace('.','')
@@ -184,72 +195,7 @@ def cadastra_orcamento(request):
                 orc[0].save()
 
 
-    return render(request, 'index.html')
-
-@login_required
-def exibir(item_indice, mes_sel):
-    lancamentos_exibir = Lancamento.objects.filter(categoria__id = item_indice, data_pagamento__month = mes_sel)                              
-    orcamentos = Orcamento.objects.filter(categoria__id = item_indice, data_orcamento__month = mes_sel)
-    lancamento_total_mensal = Lancamento.objects.filter(data_pagamento__year = 2022).values('data_pagamento__month').annotate(total=Sum('valor_pago')).order_by('data_pagamento__month')
-    orcamento_total_mensal = Orcamento.objects.filter(data_orcamento__year = 2022).values('data_orcamento__month').annotate(total=Sum('valor_orc')).order_by('data_orcamento__month')
-    categorias = Categoria.objects.all().order_by('nome')
-    
-    lista_orcamento = []
-    
-    for c in categorias:
-        l = Lancamento.objects.filter(categoria_id = c.id, data_pagamento__month = mes_sel,
-        ).values('categoria__nome').annotate(soma=Sum('valor_pago'))
-        o = Orcamento.objects.filter(categoria_id = c.id, data_orcamento__month = mes_sel,
-        ).values('categoria__nome').annotate(soma=Sum('valor_orc'))
-
-        nome = c.nome
-        if l:
-            lanc_soma = round(float(l[0]['soma']),2)
-        else:
-            lanc_soma = 0
-
-        if o:
-            orc_valor = round(float(o[0]['soma']),2)
-        else:
-            orc_valor = 0
-        
-        if orc_valor == 0:
-            uso = 's/ orçamento'
-        else:
-            uso = round((lanc_soma/orc_valor*100),2)
-        saldo = round((orc_valor - lanc_soma),2)
-        dados = {'nome':nome, 'saldo':saldo, 'uso_perc':uso, 'total':lanc_soma, 'indice':c.id, 'mes':mes_sel}
-
-        lista_orcamento.append(dados)
-        
-    
-    if len(orcamentos) > 0:
-        orc = orcamentos[0]
-    else:
-        orc = {'valor_orc': 0 }
-
-
-    graf_nome = categorias.filter(pk = item_indice).first().nome
-
-    soma_lista = 0
-
-    for item_lista in lista_orcamento:
-        if lancamentos_exibir:
-            if item_lista['nome'] == lancamentos_exibir[0].categoria.nome:
-                soma_lista = round(item_lista['total'],2)
-
-
-    context = {
-        'lancamentos': lancamentos_exibir,
-        'soma': soma_lista,
-        'graf_nome': graf_nome,
-        'orcamento' : orc,
-        'lista_orcamento' : lista_orcamento,
-        'lancamento_total_mensal' : lancamento_total_mensal,
-        'orcamento_total_mensal': orcamento_total_mensal
-        }
-    
-    return context
+    return redirect('index')
 
 @login_required
 def detalhes(request, id, m):
@@ -344,3 +290,89 @@ def atualiza_faturamento(request, id):
 
         faturamento.save() 
     return redirect('resultado')
+
+@login_required
+@permission_required('orcamento.add_autorizacao')
+def cria_autorizacao(request):
+    if request.method == 'POST':
+        categoria_id = request.POST['id']
+        justificativa = request.POST['justificativa']
+        valor = request.POST['valor']
+        user = user = get_object_or_404(User,pk=request.user.id)
+        Autorizacao.objects.create(
+            categoria = Categoria.objects.get(pk = categoria_id),
+            justificativa = justificativa,
+            valor_autorizacao = valor,
+            solicitante = user)
+
+    return redirect('lista_autorizacao')
+
+@login_required
+def carrega_autorizacao(request, id):
+    autorizacao = Autorizacao.objects.get(pk = id)
+    categorias = Categoria.objects.all().order_by('nome')
+
+    context = {
+        'autorizacao': autorizacao,
+        'categorias': categorias
+    }
+
+    return render(request, 'form_autorizacao.html', context)
+
+@login_required
+@permission_required('orcamento.change_autorizacao')
+def edita_autorizacao(request):
+    if request.method == 'POST':
+        autorizacao = Autorizacao.objects.get(pk = request.POST['id'])
+        autorizacao.categoria = get_object_or_404(Categoria, pk = request.POST['categoria'])
+        autorizacao.justificativa = request.POST['justificativa']
+        autorizacao.valor_autorizacao = request.POST['valor']
+        autorizacao.solicitante = get_object_or_404(User,pk=request.user.id)
+        autorizacao.save()
+
+    return redirect('lista_autorizacao')
+
+@login_required
+@permission_required('orcamento.delete_autorizacao')
+def exclui_autorizacao(request, id):
+
+    autorizacao = Autorizacao.objects.get(pk=id)
+    autorizacao.delete()
+
+    return redirect('lista_autorizacao')
+
+@login_required
+@permission_required('orcamento.pode_despachar', raise_exception=True)
+def despacha_autorizacao(request):
+
+    if request.method == 'POST':
+
+        autorizacao = Autorizacao.objects.get(pk=request.POST['id'])
+        autorizacao.autorizacao_status = request.POST['status']
+        autorizacao.despacho = request.POST['despacho']
+        autorizacao.despachante = get_object_or_404(User, pk=request.user.id)
+        autorizacao.save()
+        return redirect('lista_autorizacao')
+
+@login_required
+def lista_autorizacao(request):
+    autorizacoes = Autorizacao.objects.all().order_by('-data_criacao')
+    aguardando = autorizacoes.filter(autorizacao_status = 'AGU')
+    despachadas = autorizacoes.exclude(autorizacao_status = 'AGU')
+
+    context = {
+        'aguardando': aguardando,
+        'despachadas': despachadas,
+    }
+    return render (request, 'lista_autorizacoes.html', context)
+
+@login_required
+@permission_required('orcamento.view_autorizacao')
+def detalha_autorizacao(request, id):
+    autorizacao = Autorizacao.objects.get(pk = id)
+
+    context = {
+        'autorizacao': autorizacao,
+    }
+
+    return render(request, 'autorizacao_detalhes.html', context)

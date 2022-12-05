@@ -1,0 +1,61 @@
+{% extends 'base2.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container bg-secondary bg-opacity-25 p-0">
+    {% include 'partials/menu.html' %}
+
+    <div class="px-3">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item active" aria-current="page">Home</li>
+                <li class="breadcrumb-item active" aria-current="page">Usuários</li>
+                <li class="breadcrumb-item" aria-current="page">Cadastro</li>
+            </ol>
+        </nav>
+    </div>
+<div class="p-3">
+    <div class="p-3 border border-dark rounded">
+        <div class="w-50 mx-auto">
+            
+            <div class="mb-3">
+                <h2>Cadastrar Grupo</h2>
+            </div>
+            {% if sucesso %}
+            <div class="alert alert-success" role="alert">
+                {{sucesso.0}}
+            </div>
+        {% endif %}
+        {% if erros %}
+        {% for erro in erros%}
+        <div class="alert alert-danger" role="alert">
+            {{erro}}
+        </div>
+        {% endfor %}
+        {% endif %}
+        <form action="{% url 'cria_grupo' %}" method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="grupo-nome" class="form-label">Nome</label>
+                <input type="text" class="form-control" id="grupo-nome" name="nome" required>
+            </div>
+            <div class="col-sm-10">
+                <label for="permissoes" class="form-label">Permissões</label>
+                <select class="form-select form-select-sm" aria-label=".form-select-sm example" name="permissions" id="
+                user_permissions" multiple size="5" id="permissoes">
+                    {% for p in permissoes %}
+                    <option value="{{p.id}}">{{p}}</option>
+                    {% endfor %}
+                </select>
+                <p>Para selecionar várias permissões pressione ctrl ou shift.</p>
+            </div>
+            <button type="submit" class="btn btn-primary">Cadastrar</button>
+        </form>
+    </div>
+    </div>
+</div>
+    {% include 'partials/footer.html' %}
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+{% endblock %}
