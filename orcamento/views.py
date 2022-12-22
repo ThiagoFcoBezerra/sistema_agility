@@ -76,7 +76,7 @@ def index(request):
         'data' : data_selecionada,
         'mes':mes
     }
-    return render(request, 'index.html', dados)
+    return render(request, 'orcamento/index.html', dados)
 
 @login_required
 def testa_arquivo(request):
@@ -128,13 +128,13 @@ def testa_arquivo(request):
                 lanca = Lancamento.objects.create(categoria = categoria, descricao = cell2.value, valor_pago = valor_pago, data_pagamento = cell4.value)
                 lanca.save()
             
-    return render(request, 'atualiza_lancamentos2.html')
+    return render(request, 'orcamento/atualiza_lancamentos2.html')
 
 @login_required
 def orcamento(request):
     
     data_atual = datetime.datetime.now()
-    data_buscada = f"{data_atual.strftime('%Y')}-{data_atual.strftime('%m')}"
+    
     if request.method == 'POST':
         data_buscada = request.POST['mes_buscado']
         mes_buscado = data_buscada[5:7]
@@ -143,10 +143,10 @@ def orcamento(request):
         mes_buscado = data_atual.strftime('%m')
         ano_buscado = data_atual.strftime('%Y')
 
-
-        
+    data_buscada = f'{ano_buscado}-{mes_buscado}'
     categorias = Categoria.objects.all().order_by('nome')
     orc = Orcamento.objects.filter(data_orcamento__month = mes_buscado, data_orcamento__year = ano_buscado)
+
     for cat in categorias:
         orcamento_existe = orc.filter(categoria = cat)
         if not orcamento_existe:
@@ -162,7 +162,7 @@ def orcamento(request):
         'orcamentos': orcamentos,
         'data': data_buscada
     }
-    return render(request, 'orcamento2.html', dados)
+    return render(request, 'orcamento/orcamento2.html', dados)
     
 @login_required
 @permission_required('orcamento.change_orcamento', raise_exception=True)
@@ -176,6 +176,9 @@ def cadastra_orcamento(request):
         mes_final = mes+1
 
     for m in range(mes, mes_final):
+        m = str(m)
+        if len(m) < 2:
+            m = '0'+m
 
         data = f'{ano}-{m}-01'
         
@@ -184,12 +187,13 @@ def cadastra_orcamento(request):
             valor = valor.replace(',','.')
             valor = float(valor)
             valor = round(valor,2)
+            
             orc = Orcamento.objects.filter(categoria = Categoria.objects.get(nome = cat), data_orcamento = data)
             if not orc:
                 Orcamento.objects.create(categoria = Categoria.objects.get(nome = cat), data_orcamento = data, descricao = desc, valor_orc = valor)
             else:
-                orc[0].categoria = Categoria.objects.get(nome = cat)
-                orc[0].data_orcamento = data
+                #orc[0].categoria = Categoria.objects.get(nome = cat)
+                #orc[0].data_orcamento = data
                 orc[0].descricao = desc
                 orc[0].valor_orc = valor
                 orc[0].save()
@@ -230,7 +234,7 @@ def detalhes(request, id, m):
         'lancamento_total_mensal':lancamento_total_mensal,
         'orcamento_total_mensal':orcamento_total_mensal,
     }
-    return render(request, 'detalhes.html', dados)
+    return render(request, 'orcamento/detalhes.html', dados)
 
 @login_required
 def cadastra_faturamento(request):
@@ -269,7 +273,7 @@ def resultado(request):
         'data_selecionada':data_selecionada,
     }
 
-    return render(request, 'resultado.html', dados)
+    return render(request, 'orcamento/resultado.html', dados)
 
 @login_required
 def exclui_faturamento(request, id):
@@ -364,7 +368,7 @@ def lista_autorizacao(request):
         'aguardando': aguardando,
         'despachadas': despachadas,
     }
-    return render (request, 'lista_autorizacoes.html', context)
+    return render (request, 'orcamento/lista_autorizacoes.html', context)
 
 @login_required
 @permission_required('orcamento.view_autorizacao')
@@ -375,4 +379,4 @@ def detalha_autorizacao(request, id):
         'autorizacao': autorizacao,
     }
 
-    return render(request, 'autorizacao_detalhes.html', context)
+    return render(request, 'orcamento/autorizacao_detalhes.html', context)

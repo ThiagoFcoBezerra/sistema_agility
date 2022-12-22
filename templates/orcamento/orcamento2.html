@@ -1,4 +1,4 @@
-{% extends 'base2.html' %}
+{% extends 'partials/base2.html' %}
 {% load static %}
 
 {% block content %}
@@ -145,7 +145,7 @@
         {% for orcamento in orcamentos %}
         <div class="d-flex justify-content-start mb-3">
           <div class="col-4 me-3">
-            <input class="form-control" type="text" name="categoria" value="{{orcamento.categoria__nome}}" disabled="">
+            <input class="form-control" type="text" name="categoria" value="{{orcamento.categoria__nome}}" readonly>
           </div>
           <div class="col-4 me-3">
             <input class="form-control" type="text" name="descricao">

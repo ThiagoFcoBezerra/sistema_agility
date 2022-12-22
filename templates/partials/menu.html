@@ -1,4 +1,4 @@
-<div class="container p-0 mb-2">
+<div class="p-0 mb-2">
     <!-- inicio navbar -->
         <nav class="navbar navbar-expand-lg bg-light navbar-dark bg-dark">
             <div class="container-fluid">
@@ -29,10 +29,13 @@
                                 <li><a class="dropdown-item" href="{% url 'usuarios' %}">Usuários</a></li>
                                 <li><hr class="dropdown-divider">
                                 <li><a class="dropdown-item" href="{% url 'login' %}">Sair</a></li>
-                                <!--<li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="orcamento.html">Orçamentos</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="lista_autorizacoes.html">Autorizações</a></li>-->
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Game Agility</a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="{% url 'dashboard' %}">Dashboard</a></li>
+                                <li><a class="dropdown-item" href="{% url 'atualiza_game' %}">Atualiza Indicadores</a></li>
                             </ul>
                         </li>
                     </ul>

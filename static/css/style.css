@@ -35,6 +35,16 @@ body {
     font-size: 0.6rem;
     
   }
+
+  .rotulo {
+    font-weight: 800;
+  }
+
+
+  .saldo {
+    text-align: end;
+    padding-right: 5%;
+  }
   
   th, td {
     text-align: left;
@@ -56,6 +66,12 @@ body {
     border-width: 2px;
     font-size: 12px;
     font-weight: bold;
+  }
+
+  .footer{
+    background: black;
+    color: white;
+    margin-top: 5px;
   }
 
   .clicado{
