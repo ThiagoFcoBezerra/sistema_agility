@@ -12,6 +12,22 @@
 </nav>
 <!-- Início principal-->
 <section class="container">
+    <div class="container">
+        <form method="POST">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-auto">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1">Mês</span>
+                        <input type="month" class="form-control" aria-describedby="basic-addon1" name="data">
+                        <div>
+                            <input class="btn btn-primary form-control" type="submit" value="Buscar">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
     <div class="row">
         <div class="col-12 col-xl-6 text-center">
             <h1>Game Agility/FG-GOV {{game.ano_refencia}}</h1>

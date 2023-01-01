@@ -8,10 +8,24 @@ from django.contrib.auth.decorators import login_required, permission_required
 # Create your views here.
 @login_required
 def dashboard (request):
-    game = Game.objects.get(ano_refencia = 2022)
-    mensal = GameMensal.objects.get(game_ano = game, mes_referencia = 1)
-    areas = Area.objects.filter(game_mes = mensal)
-    metas = Meta.objects.filter(meta_area__game_mes = mensal)
+
+    mes = datetime.date.today()
+    ano_ref = int(mes.strftime('%Y'))
+    mes_ref = int(mes.strftime('%m'))
+    if request.method == 'POST':
+        mes = request.POST['data']
+        mes_ref = int(mes[5:])
+        ano_ref = int(mes[0:4])
+
+    game = Game.objects.filter(ano_refencia = ano_ref)
+    mensal = None
+    areas = None
+    metas = None
+    if game:
+        mensal = GameMensal.objects.filter(game_ano = game.first(), mes_referencia = mes_ref)
+    if mensal:
+        areas = Area.objects.filter(game_mes = mensal.first())
+        metas = Meta.objects.filter(meta_area__game_mes = mensal.first())
 
     dados = {
         'game': game,
@@ -25,10 +39,11 @@ def dashboard (request):
 @login_required
 @permission_required('game.atualiza_metas', raise_exception=True)
 def atualiza_game(request):
-    game = Game.objects.get(ano_refencia = 2022)
-    mensal = GameMensal.objects.get(game_ano = game, mes_referencia = 1)
-    areas = Area.objects.filter(game_mes = mensal)
-    metas = Meta.objects.filter(meta_area__game_mes = mensal)
+    game = Game.objects.all().last()
+    mensal = GameMensal.objects.filter(game_ano = game).last()
+    metas = []
+    if mensal:
+        metas = Meta.objects.filter(meta_area__game_mes = mensal)
     if request.method == 'POST':
         meta = metas.get(pk=request.POST['meta_id'])
         meta.data_atualizacao = datetime.datetime.now()
@@ -46,8 +61,8 @@ def atualiza_game(request):
 
 @login_required
 def apura_game(request):
-    game = Game.objects.get(ano_refencia = 2022)
-    mensal = GameMensal.objects.get(game_ano = game, mes_referencia = 1)
+    game = Game.objects.all().last()
+    mensal = GameMensal.objects.filter(game_ano = game).last()
     areas = Area.objects.filter(game_mes = mensal)
     metas = Meta.objects.filter(meta_area__game_mes = mensal)
 
