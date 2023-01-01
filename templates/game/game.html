@@ -7,6 +7,7 @@
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item active" aria-current="page">Home</li>
+        <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
     </ol>
 </nav>
 <!-- Início principal-->
@@ -64,10 +65,10 @@
             </div>
             <div class="row">
                 <div class="col text-center border-top border-end border-dark">
-                    <span>{{mensal.objetivo}}</span>
+                    <span id="obj-mensal">{{mensal.objetivo}}</span>
                 </div>
                 <div class="col text-center border-top border-dark">
-                    <span>{{mensal.pontos}}</span>
+                    <span id="pts-mensal">{{mensal.pontos}}</span>
                 </div>
             </div>
             <div class="row border-top border-dark">
@@ -172,29 +173,7 @@
 </section>
 <!-- final principal-->
 {% include 'partials/footer.html' %}
-<script>
-const indicadores = document.querySelectorAll('.banner-indicador');
-for (let i = 0; i < indicadores.length; i++) {
-    const orc = parseFloat(indicadores[i].childNodes[7].childNodes[1].children[0].innerText);
-    const real = parseFloat(indicadores[i].childNodes[7].childNodes[3].children[0].innerText);
-    const text = indicadores[i].childNodes[3].childNodes[3].childNodes[1].childNodes[1]
-    const graf = indicadores[i].childNodes[3].childNodes[3].childNodes[1].childNodes[3].childNodes[3]
-    let res = real / orc * 100
-
-    text.innerText = res.toFixed(0).toString() + '%';
-    console.log(res)
-
-
-    if (res > 100) {
-        res = 100;
-    }
-
-    graf.style.strokeDashoffset = 157 - 157 * res / 100;
-    
-}
-
-
-</script>
+<script src="{% static 'js/game.js' %}"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
 {% endblock %}
   

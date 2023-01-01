@@ -31,6 +31,11 @@ class Area(models.Model):
         return f'{self.area_nome} - {self.game_mes}'
 
 class Meta(models.Model):
+
+    class Meta:
+        permissions = [
+            ("Atualiza_metas", "Pode atualizar metas"),
+        ]
     meta_area = models.ForeignKey(Area, on_delete=models.CASCADE)
     meta_nome = models.CharField(max_length=50)
     pontos = models.DecimalField(max_digits=6,decimal_places=2)

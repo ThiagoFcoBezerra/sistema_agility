@@ -2,8 +2,11 @@ import datetime
 from django.shortcuts import redirect, render
 from game.models import Meta, Game, GameMensal, Area
 from django.db.models.aggregates import Sum, Avg
+from django.contrib.auth.decorators import login_required, permission_required
+
 
 # Create your views here.
+@login_required
 def dashboard (request):
     game = Game.objects.get(ano_refencia = 2022)
     mensal = GameMensal.objects.get(game_ano = game, mes_referencia = 1)
@@ -19,6 +22,8 @@ def dashboard (request):
 
     return render(request, 'game/game.html', dados)
 
+@login_required
+@permission_required('game.atualiza_metas', raise_exception=True)
 def atualiza_game(request):
     game = Game.objects.get(ano_refencia = 2022)
     mensal = GameMensal.objects.get(game_ano = game, mes_referencia = 1)
@@ -39,6 +44,7 @@ def atualiza_game(request):
 
     return render(request, 'game/atualiza_game.html', dados)
 
+@login_required
 def apura_game(request):
     game = Game.objects.get(ano_refencia = 2022)
     mensal = GameMensal.objects.get(game_ano = game, mes_referencia = 1)

@@ -64,7 +64,8 @@ def usuarios(request):
 def exclui_usuario(request, id):
     user = User.objects.get(pk = id)
 
-    user.delete()
+    user.is_active = False
+    user.save()
 
     return redirect('usuarios')
 
