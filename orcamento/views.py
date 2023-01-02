@@ -20,19 +20,19 @@ def index(request):
     
     lancamento_total_anual = Lancamento.objects.filter(data_pagamento__year = ano).values('data_pagamento__year').annotate(total=Sum('valor_pago'))
     orcamento_total_anual = Orcamento.objects.filter(data_orcamento__year = ano).values('data_orcamento__year').annotate(total=Sum('valor_orc'))
-    lancamento_total_mensal = Lancamento.objects.filter(data_pagamento__month = mes).values('data_pagamento__month').annotate(total=Sum('valor_pago'))
-    orcamento_total_mensal = Orcamento.objects.filter(data_orcamento__month = mes).values('data_orcamento__month').annotate(total=Sum('valor_orc'))
+    lancamento_total_mensal = Lancamento.objects.filter(data_pagamento__month = mes, data_pagamento__year = ano).values('data_pagamento__month').annotate(total=Sum('valor_pago'))
+    orcamento_total_mensal = Orcamento.objects.filter(data_orcamento__month = mes, data_orcamento__year = ano).values('data_orcamento__month').annotate(total=Sum('valor_orc'))
     categorias = Categoria.objects.all().order_by('nome')
 
     lista_dados_orc = []
     for categoria in categorias:
-        lanc_mensal = Lancamento.objects.filter(categoria = categoria, data_pagamento__month = mes).values('categoria').annotate(total=Sum('valor_pago'))
+        lanc_mensal = Lancamento.objects.filter(categoria = categoria, data_pagamento__month = mes, data_pagamento__year = ano).values('categoria').annotate(total=Sum('valor_pago'))
         if len(lanc_mensal) == 0:
             lanc_mensal_valor = 0
         else:
             lanc_mensal_valor = round(lanc_mensal[0]['total'],2)
 
-        orc_mensal = Orcamento.objects.filter(categoria = categoria, data_orcamento__month = mes).values('categoria').annotate(total=Sum('valor_orc'))
+        orc_mensal = Orcamento.objects.filter(categoria = categoria, data_orcamento__month = mes, data_orcamento__year = ano).values('categoria').annotate(total=Sum('valor_orc'))
         if len(orc_mensal) == 0:
             orc_mensal_valor = 0
         else:
@@ -108,7 +108,6 @@ def testa_arquivo(request):
 
         for data in ws['N']:
             if data.value != 'Data de pagamento':
-                print(data.value.strftime("%m"))
                 lancamentos_a_excluir = Lancamento.objects.filter(data_pagamento__month = data.value.strftime("%m"), data_pagamento__year = data.value.strftime("%Y"))
                 for lancamento in lancamentos_a_excluir:
                     lancamento.delete()
@@ -220,7 +219,7 @@ def detalhes(request, id, m):
 
     categorias = Categoria.objects.all().order_by('nome')
     categoria = categorias.get(pk = cat_id)
-    lancamentos_a_exibir = Lancamento.objects.filter(categoria__id = id, data_pagamento__month = mes)
+    lancamentos_a_exibir = Lancamento.objects.filter(categoria__id = id, data_pagamento__month = mes, data_pagamento__year = ano)
     lancamento_total_mensal = Lancamento.objects.filter(categoria__id = id, data_pagamento__year = ano).values('data_pagamento__month').annotate(total=Sum('valor_pago')).order_by('data_pagamento__month')
     orcamento_total_mensal = Orcamento.objects.filter(categoria__id = id, data_orcamento__year = ano).values('data_orcamento__month').annotate(total=Sum('valor_orc')).order_by('data_orcamento__month')
 
