@@ -76,13 +76,10 @@
     </div>
   </div>
     <!-- início principal -->
-    <div class="container bg-secondary bg-opacity-25 p-0">
-        <div class="container p-0 mb-2">
-            <!-- inicio navbar -->
-            {% include 'partials/menu.html' %}
-
-          <!-- final navbar -->
-      </div>
+    <!-- inicio navbar -->
+    {% include 'partials/menu.html' %}
+    <!-- final navbar -->
+    <div class="container-fluid">
       <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
         <div class="offcanvas-header">
           <h5 class="offcanvas-title" id="offcanvasRightLabel">Pendentes de análises</h5>
@@ -92,13 +89,13 @@
           <a href="autorizacoes.html"><h5>Equipamentos Compras Novas</h5></a>
         </div>
       </div>
-      <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-          <li class="breadcrumb-item active" aria-current="page">Atualiza Pagamentos</li>
-        </ol>
-      </nav>
-      <div class="container">
+      <div class="container-fluid">
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+              <li class="breadcrumb-item active" aria-current="page">Atualiza Pagamentos</li>
+            </ol>
+          </nav>
           <div class="vh-100 border border-dark p-3">
               <h3>Atualizar Lançamentos de Pagamentos</h3>
               <form action="testa_arquivo" method="POST" enctype="multipart/form-data">
@@ -120,10 +117,10 @@
           </form>
           </div>
       </div>
-      <div class="container bg-dark text-white p-0">
+    </div> 
+      
         {% include 'partials/footer.html' %}
-      </div>
-  </div> 
+      
   <!-- final principal-->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
 </body>

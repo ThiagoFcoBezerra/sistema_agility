@@ -8,27 +8,26 @@ from django.contrib.auth.decorators import login_required, permission_required
 # Create your views here.
 @login_required
 def dashboard (request):
-
-    mes = datetime.date.today()
-    ano_ref = int(mes.strftime('%Y'))
-    mes_ref = int(mes.strftime('%m'))
-    if request.method == 'POST':
-        mes = request.POST['data']
-        mes_ref = int(mes[5:])
-        ano_ref = int(mes[0:4])
-
-    game = Game.objects.filter(ano_refencia = ano_ref)
+   
+    game = Game.objects.all().last()
+    lista_mensal = GameMensal.objects.filter(game_ano = game)
     mensal = None
     areas = None
     metas = None
-    if game:
-        mensal = GameMensal.objects.filter(game_ano = game.first(), mes_referencia = mes_ref)
+    if request.method == 'POST':
+        chave = request.POST['data']
+        mensal = GameMensal.objects.get(pk = chave)
+    else:
+        if game:
+            mensal = GameMensal.objects.filter(game_ano = game).last()
+
     if mensal:
-        areas = Area.objects.filter(game_mes = mensal.first())
-        metas = Meta.objects.filter(meta_area__game_mes = mensal.first())
+        areas = Area.objects.filter(game_mes = mensal)
+        metas = Meta.objects.filter(meta_area__game_mes = mensal)
 
     dados = {
         'game': game,
+        'lista_mensal':lista_mensal,
         'mensal': mensal,
         'areas': areas,
         'metas': metas
@@ -49,7 +48,7 @@ def atualiza_game(request):
         meta.data_atualizacao = datetime.datetime.now()
         meta.realizado_anterior = meta.realizado
         meta.realizado = request.POST['meta_valor']
-        pontos = round((float(request.POST['meta_valor'])/float(meta.orcado) * float(meta.peso)*10),2)
+        pontos = round((float(request.POST['meta_valor'])/float(meta.orcado) * float(meta.peso)),2)
         meta.pontos = str(pontos)
         meta.save()
 
@@ -69,10 +68,10 @@ def apura_game(request):
     total_areas = metas.values('meta_area').annotate(total = Sum('pontos'))
     for total in total_areas:
         area = areas.get(pk = total['meta_area'])
-        area.pontos = total['total'] * area.peso / 100
+        area.pontos = total['total'] * area.peso / 1000
         area.save()
 
-    total_mensal = Area.objects.aggregate(Sum('pontos'))
+    total_mensal = Area.objects.filter(game_mes = mensal).aggregate(Sum('pontos'))
     mensal.pontos = total_mensal['pontos__sum']
     mensal.save()
 

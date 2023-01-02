@@ -2,9 +2,9 @@
 {% load static %}
 
 {% block content %}
-<div class="container bg-secondary bg-opacity-25 p-0">
+{% include 'partials/menu.html' %}
+<div class="container-fluid">
 
-    {% include 'partials/menu.html' %}
     <!-- Modal2 -->
     <div class="modal fade" id="exampleModal2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -195,9 +195,9 @@
             </div>
         </div>
     </div>
-    {% include 'partials/footer.html' %}
     <!-- final principal-->
 </div>
+{% include 'partials/footer.html' %}
 <div class="d-none">
     {% for f in fat_dia %}
     <div class="fat-dia">
