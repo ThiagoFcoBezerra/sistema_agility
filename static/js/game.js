@@ -11,7 +11,6 @@ for (let i = 0; i < indicadores.length; i++) {
     let res = real / orc * 100
 
     text.innerText = res.toFixed(0).toString() + '%';
-    console.log(res)
 
 
     if (res > 100) {
@@ -30,7 +29,7 @@ function atualizaBarra(){
     
     let progresso = parseFloat(pontos.innerText) / parseFloat(objetivo.innerText) * 100;
 
-    barra.innerText = `${(progresso)}%`
+    barra.innerText = `${(progresso.toFixed(2))}%`
 
     if(progresso > 100){
         progresso = 100;
