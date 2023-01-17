@@ -1,57 +1,96 @@
-{% extends 'partials/base2.html' %}
+{% extends 'partials/base2.html' %} 
 {% load static %}
-
 {% block content %}
 {% include 'partials/menu.html' %}
 <div class="container-fluid">
-    <div class="container-fluid min-vh-100" style="margin-top: 5px;padding: 5px 11px 0px 11px;">
+  <div class="container-fluid min-vh-100" style="margin-top: 5px; padding: 5px 11px 0px 11px">
     <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item active" aria-current="page">Home</li>
-            <li class="breadcrumb-item" aria-current="page">Autorizações</li>
-        </ol>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item active" aria-current="page">Home</li>
+        <li class="breadcrumb-item" aria-current="page">Autorizações</li>
+      </ol>
     </nav>
     <h3>Autorizações de Despesas</h3>
     <div class="border border-dark border rounded p-3">
-        <div class="mx-auto">
-            <form action="{% url 'edita_autorizacao' %}" method="post">
-                <div class="mb-3">
-                  <label for="data" class="form-label">Código</label>
-                  <input type="text" class="form-control" id="data" value="{{autorizacao.id}}"readonly>
-                </div> 
-                <div class="mb-3">
-                  <label for="data" class="form-label">Categoria</label>
-                  <input type="text" class="form-control" id="data" value="{{autorizacao.categoria}}"readonly>
-                </div>  
-                <div class="mb-3">
-                    <label for="data" class="form-label">Data</label>
-                    <input type="text" class="form-control" id="data" value="{{autorizacao.data_criacao|date:'d/m/Y'}}"readonly>
+      <div class="mx-auto">
+        <form action="{% url 'edita_autorizacao' %}" method="post">
+          <div class="mb-3">
+            <label for="data" class="form-label">Código</label>
+            <input type="text" class="form-control" id="data" value="{{autorizacao.id}}" readonly />
+          </div>
+          <div class="mb-3">
+            <label for="data" class="form-label">Categoria</label>
+            <input type="text" class="form-control" id="data" value="{{autorizacao.categoria}}" readonly />
+          </div>
+          <div class="mb-3">
+            <label for="data" class="form-label">Data</label>
+            <input type="text" class="form-control" id="data" value="{{autorizacao.data_criacao|date:'d/m/Y'}}"
+              readonly />
+          </div>
+          <div class="mb-3">
+            <label for="justificativa" class="form-label">Justificativa</label>
+            <textarea class="form-control" id="justificativa" rows="3" name="justificativa" readonly>
+{{autorizacao.justificativa}}</textarea>
+          </div>
+          <div class="mb-3">
+            <label for="valor" class="form-label">Valor</label>
+            <input type="number" step="0.01" class="form-control" id="valor" name="valor"
+              value="{{autorizacao.valor_autorizacao|floatformat:'2u'}}" readonly />
+          </div>
+          <div class="mb-3">
+            <label for="data" class="form-label">Solicitante</label>
+            <input type="text" class="form-control" id="data" value="{{autorizacao.solicitante}}" readonly />
+          </div>
+          <div class="mb-3">
+            <label for="justificativa" class="form-label">Despacho</label>
+            <textarea class="form-control" id="justificativa" rows="3" name="justificativa" readonly>
+{{autorizacao.despacho}}</textarea>
+          </div>
+          <div class="mb-3">
+            <label for="data" class="form-label">Despachante</label>
+            <input type="text" class="form-control" id="data" value="{{autorizacao.despachante}}" readonly />
+          </div>
+        </form>
+        {% if autorizacao.autorizacao_status == 'APR' and autorizacao.utilizada == False %}
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+          Utilizar Autorização
+        </button>
+        {% else %}
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" disabled>
+          Utilizar Autorização
+        </button>
+        {% endif %}
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Utilizar Autorizaçao</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <form action="{% url 'utiliza_autorizacao' %}" method="POST">
+                {% csrf_token %} 
+                <input type="hidden" name="id" value="{{autorizacao.id}}">
+                <div class="modal-body">
+                  <div class="input-group">
+                    <span class="input-group-text">Utilização</span>
+                    <textarea class="form-control" aria-label="With textarea" name="justificativa"></textarea>
+                  </div>
                 </div>
-                <div class="mb-3">
-                    <label for="justificativa" class="form-label">Justificativa</label>
-                    <textarea class="form-control" id="justificativa" rows="3" name="justificativa" readonly>{{autorizacao.justificativa}}</textarea>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                  <button type="submit" class="btn btn-primary">Confirmar</button>
                 </div>
-                <div class="mb-3">
-                  <label for="valor" class="form-label">Valor</label>
-                  <input type="number" step="0.01" class="form-control" id="valor" name="valor" value="{{autorizacao.valor_autorizacao|floatformat:'2u'}}" readonly>
-                </div>
-                <div class="mb-3">
-                  <label for="data" class="form-label">Solicitante</label>
-                  <input type="text" class="form-control" id="data" value="{{autorizacao.solicitante}}" readonly>
-                </div>
-                <div class="mb-3">
-                  <label for="justificativa" class="form-label">Despacho</label>
-                  <textarea class="form-control" id="justificativa" rows="3" name="justificativa" readonly>{{autorizacao.despacho}}</textarea>
-                </div>
-                <div class="mb-3">
-                  <label for="data" class="form-label">Despachante</label>
-                  <input type="text" class="form-control" id="data" value="{{autorizacao.despachante}}" readonly>
-                </div>
-            </form>
+              </form>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
-</div>
+  </div>
 </div>
 {% include 'partials/footer.html' %}
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+  integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
 {% endblock %}

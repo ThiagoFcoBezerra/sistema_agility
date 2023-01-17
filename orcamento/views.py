@@ -17,66 +17,32 @@ def index(request):
         ano = data.strftime("%Y")
         mes = data.strftime("%m")
         data_selecionada = f'{ano}-{mes}'
-    
-    lancamento_total_anual = Lancamento.objects.filter(data_pagamento__year = ano).values('data_pagamento__year').annotate(total=Sum('valor_pago'))
-    orcamento_total_anual = Orcamento.objects.filter(data_orcamento__year = ano).values('data_orcamento__year').annotate(total=Sum('valor_orc'))
-    lancamento_total_mensal = Lancamento.objects.filter(data_pagamento__month = mes, data_pagamento__year = ano).values('data_pagamento__month').annotate(total=Sum('valor_pago'))
-    orcamento_total_mensal = Orcamento.objects.filter(data_orcamento__month = mes, data_orcamento__year = ano).values('data_orcamento__month').annotate(total=Sum('valor_orc'))
+
+
+    orcamento_total_mensal = Orcamento.objects.filter(data_orcamento__month = mes, data_orcamento__year = ano).values('categoria__nome').annotate(total_mes = Sum('valor_orc'))
+    lancamento_total_mensal = Lancamento.objects.filter(data_pagamento__month = mes, data_pagamento__year = ano).values('categoria__nome').annotate(total_mes = Sum('valor_pago'))
+    orcamento_total_anual = Orcamento.objects.filter(data_orcamento__year = ano).values('categoria__nome').annotate(total_mes = Sum('valor_orc'))
+    lancamento_total_anual = Lancamento.objects.filter(data_pagamento__year = ano).values('categoria__nome').annotate(total_mes = Sum('valor_pago'))
+    autorizacao_total_mensal = Autorizacao.objects.filter(
+        data_autorizacao__month = mes, 
+        data_autorizacao__year = ano, 
+        utilizada = False,
+        autorizacao_status = 'APR'
+        ).values('categoria__nome').annotate(total_mes = Sum('valor_autorizacao'))
     categorias = Categoria.objects.all().order_by('nome')
 
-    lista_dados_orc = []
-    for categoria in categorias:
-        lanc_mensal = Lancamento.objects.filter(categoria = categoria, data_pagamento__month = mes, data_pagamento__year = ano).values('categoria').annotate(total=Sum('valor_pago'))
-        if len(lanc_mensal) == 0:
-            lanc_mensal_valor = 0
-        else:
-            lanc_mensal_valor = round(lanc_mensal[0]['total'],2)
-
-        orc_mensal = Orcamento.objects.filter(categoria = categoria, data_orcamento__month = mes, data_orcamento__year = ano).values('categoria').annotate(total=Sum('valor_orc'))
-        if len(orc_mensal) == 0:
-            orc_mensal_valor = 0
-        else:
-            orc_mensal_valor = round(orc_mensal[0]['total'],2)
-        
-        lanc_anual = Lancamento.objects.filter(categoria = categoria, data_pagamento__year = ano).values('categoria').annotate(total=Sum('valor_pago'))
-        if len(lanc_anual) == 0:
-            lanc_anual_valor = 0
-        else:
-            lanc_anual_valor = round(lanc_anual[0]['total'],2)
-
-        orc_anual = Orcamento.objects.filter(categoria = categoria, data_orcamento__year = ano).values('categoria').annotate(total=Sum('valor_orc'))
-        if len(orc_anual) == 0:
-            orc_anual_valor = 0
-        else:
-            orc_anual_valor = round(orc_anual[0]['total'],2)
-        dados_orc = {
-                    'categoria_id': categoria.id,
-                    'nome':categoria.nome,
-                    'lanc_mensal_valor':lanc_mensal_valor,
-                    'orc_mensal_valor':orc_mensal_valor,
-                    'lanc_anual_valor':lanc_anual_valor,
-                    'orc_anual_valor':orc_anual_valor
-                    }
-        lista_dados_orc.append(dados_orc)
-
-    if len(lancamento_total_anual) == 0 or len(orcamento_total_anual) == 0:
-        uso_anual = '0%'
-    else:
-        uso_anual = f"{round(lancamento_total_anual[0]['total'] / orcamento_total_anual[0]['total'] * 100,2)}%"
-    
-    if len(lancamento_total_mensal) == 0 or len(orcamento_total_mensal) == 0:
-        uso_mensal = '0%'
-    else:
-        uso_mensal = f"{round(lancamento_total_mensal[0]['total'] / orcamento_total_mensal[0]['total'] * 100,2)}%"
-
-    dados = {
-        'lista_dados_orc':lista_dados_orc,
-        'uso_anual': uso_anual,
-        'uso_mensal': uso_mensal,
-        'data' : data_selecionada,
-        'mes':mes
+    context = {
+        'orcamento_total_mensal' : orcamento_total_mensal,
+        'lancamento_total_mensal' : lancamento_total_mensal,
+        'orcamento_total_anual' : orcamento_total_anual,
+        'lancamento_total_anual' : lancamento_total_anual,
+        'autorizacao_total_mensal' : autorizacao_total_mensal,
+        'categorias' : categorias,
+        'data_selecionada' : data_selecionada,
+        'mes': mes
     }
-    return render(request, 'orcamento/index.html', dados)
+    
+    return render(request, 'orcamento/index.html', context)
 
 @login_required
 def testa_arquivo(request):
@@ -320,7 +286,7 @@ def carrega_autorizacao(request, id):
         'categorias': categorias
     }
 
-    return render(request, 'form_autorizacao.html', context)
+    return render(request, 'orcamento/form_autorizacao.html', context)
 
 @login_required
 @permission_required('orcamento.change_autorizacao')
@@ -379,3 +345,14 @@ def detalha_autorizacao(request, id):
     }
 
     return render(request, 'orcamento/autorizacao_detalhes.html', context)
+
+def utiliza_autorizacao(request):
+    if request.method == 'POST':
+        aut = Autorizacao.objects.get(pk = request.POST['id'])
+        if aut.autorizacao_status == 'APR' and aut.utilizada == False:
+            aut.descreve_utilizacao = request.POST['justificativa']
+            aut.utilizada = True
+            aut.save()
+
+    return redirect('lista_autorizacao')
+

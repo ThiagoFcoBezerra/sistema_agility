@@ -57,5 +57,7 @@ class Autorizacao(models.Model):
     autorizacao_status = models.CharField(choices=status, default=AGUARDANDO, max_length=20)
     justificativa = models.TextField(blank=False)
     despacho = models.TextField(blank=True)
+    descreve_utilizacao = models.TextField(blank=True)
+    utilizada = models.BooleanField(default=False, blank=True)
     solicitante = models.ForeignKey(User, on_delete=models.CASCADE,related_name='solicitante', null=True)
     despachante = models.ForeignKey(User, on_delete=models.CASCADE, related_name='despachante', null=True, blank=True)

@@ -49,6 +49,7 @@
                         <th scope="col">Data</th>
                         <th scope="col">Status</th>
                         <th scope="col">Valor</th>
+                        <th scope="col">Utilizada</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -59,6 +60,11 @@
                         <td>{{aut.data_criacao|date:"d/m/Y" }}</td>
                         <td>{{aut.autorizacao_status}}</td>
                         <td>{{aut.valor_autorizacao }}</td>
+                        {% if aut.utilizada %}
+                        <td>Sim</td>
+                        {% else %}
+                        <td>Não</td>
+                        {% endif %}
                       </tr>
                     {% endfor %}
                     </tbody>

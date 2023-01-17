@@ -23,7 +23,7 @@
 								<label class="form-label">Selecione o período</label>
 							</div>
 							<div class="col">
-								<input id="data" type="month" class="form-control" name="data" value="{{data}}">
+								<input id="data" type="month" class="form-control" name="data" value="{{data_selecionada}}">
 							</div>
 							<div class="col">
 								<input type="submit" class="btn btn-primary" name="">
@@ -47,22 +47,42 @@
 						</div>
 		    		</div>
 	    		</div>
-	    		<div class="d-flex justify-content-start flex-wrap">
-					{% for item in lista_dados_orc %}
-			    	<div class="m-1" style="min-width: 222px">
-			    		<div class="card border-dark mb-3 shadow rounded cartao" style="max-width: 14rem">
+				<div class="d-flex justify-content-around flex-wrap">
+					{% for categoria in categorias %}
+			    	<div class="cartao m-1" style="width: 280px">
+			    		<div class="card border-dark mb-3 shadow rounded">
 	  						<div class="card-header text-center text-white bg-primary" style="min-height: 74px;">
-	  							<h5>{{item.nome}}</h5>
+	  							<h5>{{categoria.nome}}</h5>
 	  						</div>
-	  						<div class="card-body text-dark">
-	  							<div class="row" style="max-height: 4rem;">
-	  								<div class="col text-center" style="max-width: 7rem;">
-	  									<h6>Saldo</h6>
-	  									<h6>R$10.000,00</h6>
+	  						<div class="text-dark">
+	  							<div class="row">
+	  								<div class="col-6 text-center my-auto">
+	  									<div>
+                                            <strong>Saldo</strong>
+                                        </div>
+	  									<div class="saldo">
+                                           10.000,00
+                                        </div>
+                                        <div>
+                                            <strong>Autorizado</strong>
+                                        </div>
+	  									<div class="autorizado">
+                                            
+                                                {% for autorizacao in autorizacao_total_mensal %}
+                                                {% if categoria.nome == autorizacao.categoria__nome %}
+                                                {{autorizacao.total_mes|floatformat:2}}
+                                                {% endif %}
+                                                {% endfor %}
+                                            
+                                        </div>
+                                        
+	  									
+
 	  								</div>
-	  								<div class="col">
+	  								<div class="col-6 text-center">
 	  									<svg height="75px" width="75px" style="transform: rotate(270deg);">
             								<circle cx="50%" cy="50%" r="30" stroke="#90A19D" stroke-width="12" fill="none" stroke-dasharray="189"/>
+            								<circle cx="50%" cy="50%" r="30" stroke="#FFFF00" stroke-width="12" fill="none" stroke-dasharray="189" stroke-dashoffset="189"/>
             								<circle cx="50%" cy="50%" r="30" stroke="#63DB0D" stroke-width="12" fill="none" stroke-dasharray="189" stroke-dashoffset="189"/>
           								</svg>
           								<div style="font-size: 17px;text-align: center;position: relative;left: -2px;bottom: 51px;font-weight: 600;">
@@ -77,19 +97,32 @@
 								</div>
 								<div class="row bg-info">
 									<div class="col text-center">
+                                        
 										<span>Orçado</span>
+                                        
 									</div>
 									<div class="col text-center">
 										<span>Realizado</span>
 									</div>
 								</div>
 								<div class="row bg-info" style="--bs-bg-opacity: .5;">
-									<div class="col text-center">
-										<span class="cartao-dados">{{item.orc_mensal_valor}}</span>
+									<div class="col text-center cartao-dados">
+                                        {% for orcamento in orcamento_total_mensal %}
+                                        {% if categoria.nome == orcamento.categoria__nome %}
+										{{orcamento.total_mes|floatformat:2}}
+                                        {% endif %}
+                                        {% endfor %}
 									</div>
-									<div class="col text-center">
-										<span class="cartao-dados">{{item.lanc_mensal_valor}}</span>
-									</div>
+									<div class="col text-center cartao-dados">
+                                        {% for lancamento in lancamento_total_mensal %}
+                                        {% if categoria.nome == lancamento.categoria__nome %}
+                                        {% if lancamento.total_mes %}
+										{{lancamento.total_mes|floatformat:2}}
+                                        {% else %}
+                                        0,00
+                                        {% endif %}
+                                        {% endif %}
+                                        {% endfor %}									</div>
 								</div>
 								<div class="row text-center bg-primary text-white">
 									<h6>Anual</h6>
@@ -103,15 +136,31 @@
 									</div>
 								</div>
 								<div class="row bg-info" style="--bs-bg-opacity: .5;">
-									<div class="col text-center">
-										<span>{{item.orc_anual_valor}}</span>
+									<div class="col text-center cartao-dados">
+                                        {% for orcamento in orcamento_total_anual %}
+                                        {% if categoria.nome == orcamento.categoria__nome %}
+                                        {%if orcamento.total_mes%}
+										{{orcamento.total_mes|floatformat:2}}
+                                        {% else %}
+                                        0,00
+                                        {% endif %}
+                                        {% endif %}
+                                        {% endfor %}
 									</div>
-									<div class="col text-center">
-										<span>{{item.lanc_anual_valor}}</span>
+									<div class="col text-center cartao-dados">
+                                        {% for lancamento in lancamento_total_anual %}
+                                        {% if categoria.nome == lancamento.categoria__nome %}
+                                        {% if lancamento.total_mes %}
+                                            {{lancamento.total_mes|floatformat:2}}
+                                        {% else %}
+                                            0,00
+                                        {% endif %}
+                                        {% endif %}
+                                        {% endfor %}
 									</div>
 								</div>
 								<div class="d-flex justify-content-center mt-2">
-									<a class="btn btn-primary mx-auto" href="{% url 'detalhes' id=item.categoria_id m=mes%}" role="button" data-bs-toggle="tooltip" title="Detalhar"><i class="bi bi-graph-up-arrow"></i><span class="ms-1">Detalhar</span></a>
+									<a class="btn btn-primary mx-auto" href="{% url 'detalhes' id=categoria.id m=mes %}" role="button" data-bs-toggle="tooltip" title="Detalhar"><i class="bi bi-graph-up-arrow"></i><span class="ms-1">Detalhar</span></a>
 								</div>
 	  						</div>
 						</div>
