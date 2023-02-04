@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'game',
     'orcamento',
     'usuarios',
+    'cliente',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

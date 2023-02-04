@@ -21,5 +21,6 @@ urlpatterns = [
     path('', include('orcamento.urls')),    
     path('usuarios/', include('usuarios.urls')),    
     path('game/', include('game.urls')),    
-    path('accounts/', include('django.contrib.auth.urls'))
+    path('accounts/', include('django.contrib.auth.urls')),
+    path('cliente/', include('cliente.urls')),
 ]

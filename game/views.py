@@ -1,8 +1,8 @@
 import datetime
 from django.shortcuts import redirect, render
-from game.models import Meta, Game, GameMensal, Area
-from django.db.models.aggregates import Sum, Avg
+from django.db.models.aggregates import Sum, Avg, Count
 from django.contrib.auth.decorators import login_required, permission_required
+from game.models import Meta, Game, GameMensal, Area
 
 
 # Create your views here.
@@ -78,6 +78,5 @@ def apura_game(request):
     total_game = GameMensal.objects.aggregate(Avg('pontos'))
     game.pontos = total_game['pontos__avg']
     game.save()
-    print(total_game)
 
     return redirect('dashboard')
