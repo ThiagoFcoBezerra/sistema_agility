@@ -147,19 +147,19 @@ def cadastra_orcamento(request):
 
         data = f'{ano}-{m}-01'
         
-        for cat, desc, valor in zip(request.POST.getlist('categoria'), request.POST.getlist('descricao'), request.POST.getlist('valor')):
-            valor = valor.replace('.','')
-            valor = valor.replace(',','.')
-            valor = float(valor)
-            valor = round(valor,2)
+        for cat, valor in zip(request.POST.getlist('categoria'), request.POST.getlist('valor')):
+            print(valor)
+            #valor = valor.replace('.','')
+            #valor = valor.replace(',','.')
+            #valor = float(valor)
+            #valor = round(valor,2)
             
             orc = Orcamento.objects.filter(categoria = Categoria.objects.get(nome = cat), data_orcamento = data)
             if not orc:
-                Orcamento.objects.create(categoria = Categoria.objects.get(nome = cat), data_orcamento = data, descricao = desc, valor_orc = valor)
+                Orcamento.objects.create(categoria = Categoria.objects.get(nome = cat), data_orcamento = data, valor_orc = valor)
             else:
                 #orc[0].categoria = Categoria.objects.get(nome = cat)
                 #orc[0].data_orcamento = data
-                orc[0].descricao = desc
                 orc[0].valor_orc = valor
                 orc[0].save()
 
@@ -354,5 +354,5 @@ def utiliza_autorizacao(request):
             aut.utilizada = True
             aut.save()
 
-    return redirect('lista_autorizacao')
 
+    return redirect('lista_autorizacao')

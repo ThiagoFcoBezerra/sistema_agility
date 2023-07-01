@@ -131,11 +131,11 @@
           <div class="col-4 me-3">
             <h5>Categoria</h5>
           </div>
-          <div class="col-4 me-3">
-            <h5>Descrição</h5>
+          <div class="col-2 me-3">
+            <h5>Valor Atual</h5>
           </div>
           <div class="col-4">
-            <h5>Valor</h5>
+            <h5>Novo Valor</h5>
           </div>
         </div>
         {% for orcamento in orcamentos %}
@@ -143,11 +143,11 @@
           <div class="col-4 me-3">
             <input class="form-control" type="text" name="categoria" value="{{orcamento.categoria__nome}}" readonly>
           </div>
-          <div class="col-4 me-3">
-            <input class="form-control" type="text" name="descricao">
+          <div class="col-2 me-3">
+            <input class="form-control" type="text" name="descricao" value="{{orcamento.soma|floatformat:"2"}}" readonly>
           </div>
           <div class="col-auto">
-            <input class="form-control entrada-valor" type="text" name="valor" value="{{orcamento.soma}}">
+            <input class="form-control entrada-valor" type="number" name="valor" value="{{orcamento.soma|floatformat:"2u"}}" step="0.01">
           </div>
         </div>
         {% endfor %}
