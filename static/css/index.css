@@ -1,0 +1,26 @@
+@keyframes grafico {
+	from {stroke-dashoffset: 189;}
+	to {stroke-dashoffset: 0;}			
+	}
+
+@keyframes graf-game {
+	from {stroke-dashoffset: 157;}
+	to {stroke-dashoffset: 0;}			
+	}
+	
+svg :nth-child(2) {
+	animation-name: grafico;
+	animation-duration: 2s;
+			
+	}
+
+svg :nth-child(3) {
+	animation-name: grafico;
+	animation-duration: 2s;
+			
+	}
+.graf-game :nth-child(2) {
+	animation-name: graf-game;
+	animation-duration: 2s;
+			
+	}

@@ -1,0 +1,147 @@
+{% extends 'partials/base2.html' %}
+{% load static %}
+
+{% block content %}
+
+{% include 'partials/menu.html' %}
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Novo Contato</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form action="{% url 'cria_contato' %}" method="POST">
+        <div class="modal-body">
+                {% csrf_token %}
+                <label for="cliente">Cliente:</label>
+                <input type="text" name="cliente" id="cliente">
+                <label for="motivo">Motivo:</label>
+                <select name="motivo" id="motivo">
+                    {% for motivo in motivos %}
+                    <option value="{{motivo.id}}">{{motivo.descricao}}</option>
+                    {% endfor %}   
+                </select>
+                <a href="{% url 'cria_motivo' %}">+</a>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancela</button>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Contatos</li>
+    </ol>
+</nav>
+  <section class="container">
+    <div class="row justify-content-between mt-3">
+        <div class="col-auto">
+            <h1>Contatos</h1>
+        </div>
+        <div class="col-auto">
+            <!-- Button trigger modal -->
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                Novo Contato
+            </button>
+        </div>
+    </div>
+    <div class="row my-3">
+        <form method="get">
+         
+                <label> Filtrar por:</label>
+                <input type="radio" id="filtroChoice1" name="filtro" value="dia" checked />
+                <label for="filtroChoice1">Dia</label>
+                
+                <input type="radio" id="filtroChoice2" name="filtro" value="mes" />
+                <label for="filtroChoice2">Mês</label>
+                
+                <input type="radio" id="filtroChoice3" name="filtro" value="ano" />
+                <label for="filtroChoice3">Ano</label>
+                
+                <input type="date" name="data" id="data">
+
+                <label for="motivo">Motivo</label>
+                <select name="motivo" id="motivo">
+                    <option value=></option>
+                    {% if motivos %}
+                    {%for motivo in motivos%}
+                    <option value="{{motivo.id}}">{{motivo.descricao}}</option>
+                    {%endfor%}
+                    {%endif%}
+                </select>
+         
+                <label for="resultado">Resultado</label>
+                <select name="resultado" id="resultado">
+                    <option value=""></option>
+                    <option value="SIM">Produto Vendido</option>
+                    <option value="NAO">Venda Não Realizada</option>
+                </select>
+            
+                <label> Concluído:</label>
+                <input type="radio" id="concluidoChoice1" name="concluido" value="True" />
+                <label for="concluidoChoice1">Sim</label>
+                
+                <input type="radio" id="concluidoChoice2" name="concluido" value="False" />
+                <label for="concluidoChoice2">Não</label>
+            
+                <button class="btn btn-primary" type="submit">Consultar</button>
+        </form>
+    </div>
+    <div class="border border-dark rounded p-2">      
+        <table class="table table-striped">
+            <thead>
+                <th scope="col">Data do Contato</th>
+                <th scope="col">Cliente</th>
+                <th scope="col">Motivo</th>
+                <th scope="col">Agendado</th>
+                <th scope="col">Resultado</th>
+                <th scope="col">Concluído</th>
+            </thead>
+            <tbody>
+                {% for contato in contatos %}
+                
+                <tr>
+                    <td>{{contato.data|date:'SHORT_DATE_FORMAT'}}</td>
+                    <td><a href="{% url 'cria_relato' id=contato.id %}">{{contato.cliente}}</a></td>
+                    <td>{{contato.motivo}}</td>
+                    <td>{{contato.data_agendamento|date:'SHORT_DATE_FORMAT'}}</td>
+                    <td>
+                        {% if contato.resultado == 'SIM' %}
+                        <i class="bi bi-hand-thumbs-up" style="font-size: 1.5rem; color: rgb(8, 158, 41);"></i>
+                        {% elif contato.resultado == 'NAO' %}
+                        <i class="bi bi-hand-thumbs-down" style="font-size: 1.5rem; color: rgb(233, 9, 9);"></i>
+                        {% else %}
+                        Sem Resultado
+                        {%endif%}
+                        
+                    </td>
+                    <td>
+                        {% if contato.concluido %}
+                        <i class="bi bi-check2-square" style="font-size: 1.5rem; color: rgb(8, 158, 41);"></i>
+                        {% else %}
+                        <i class="bi bi-x-circle" style="font-size: 1.5rem; color: rgb(233, 9, 9);"></i>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>Total: {{total_contatos}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+{% include 'partials/footer.html' %}
+{% endblock %}

@@ -1,0 +1,65 @@
+body {
+    background: #858686;
+  }
+  .usuario{
+    vertical-align: middle;
+    margin-right: 5px;
+    margin-bottom: 0px;
+  }
+  .link {
+    color: black;
+    font-size: 1em;
+  }
+
+  .cartao {
+    padding: 5px 0px 5px 5px;
+    border: solid;
+    border-radius: 5px;
+    margin: 3px;
+    border-color: #454546;
+    background: #858686;
+  }
+  .form {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    vertical-align: middle;
+  }
+  .tabela {
+    padding-left: 0px;
+    height: 250px;
+    overflow-y: auto;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 0.6rem;
+    
+  }
+  
+  th, td {
+    text-align: left;
+    padding: 8px;
+  }
+  
+  tr:nth-child(even) {
+    background-color: #D6EEEE;
+  }
+
+  .mini-grafico {
+    text-align: center;
+    width:100px;
+    height: 22px;
+    background: linear-gradient(90deg, rgb(85, 80, 155) calc(0.7 * 100%), transparent 0%);
+    border: black;
+    border-style: solid;
+    border-radius: 14px;
+    border-width: 2px;
+    font-size: 12px;
+    font-weight: bold;
+  }
+
+  .clicado{
+    border: solid;
+    border-radius: 6px;
+    border-color: aqua;
+  }
