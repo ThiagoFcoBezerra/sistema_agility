@@ -102,13 +102,28 @@
                 {% csrf_token %}
               <div class="row row-cols-auto border border-dark rounded-2 p-2 mx-1 justify-content-start align-items-center">
                   <div class="col">
-                      <label class="form-label">Selecione o período</label>
-                  </div>
-                  <div class="col">
-                      <input type="month" class="form-control" name="mes">
-                  </div>
-                  <div class="col">
+                      <label class="form-label">Selecione o arquivo</label>
                       <input type="file" class="form-control" name="arquivo">
+                  </div>
+                  <div class="col">
+                      <label class="form-label">Nome da Planilha</label>
+                      <input type="text" class="form-control" name="planilha">
+                  </div>
+                  <div class="col">
+                      <label class="form-label">Informe Coluna Data</label>
+                      <input type="text" class="form-control" name="col_data">
+                  </div>
+                  <div class="col">
+                      <label class="form-label">Informe Coluna Descrição</label>
+                      <input type="text" class="form-control" name="col_descricao">
+                  </div>
+                  <div class="col">
+                      <label class="form-label">Informe Coluna Dalor</label>
+                      <input type="text" class="form-control" name="col_valor">
+                  </div>
+                  <div class="col">
+                      <label class="form-label">Informe Coluna Categoria</label>
+                      <input type="text" class="form-control" name="col_categoria">
                   </div>
                   <div class="col">
                       <input type="submit" class="btn btn-primary">

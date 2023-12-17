@@ -5,13 +5,49 @@ from orcamento.models import Categoria, Lancamento, Orcamento, Faturamento, Auto
 from django.db.models.aggregates import Sum
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import User
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
 
 @login_required
 def index(request):
+    
+    return render(request, 'orcamento/index.html', contexto_index(request))
+
+@api_view(['GET'])
+def api_index(request):
+    dados = contexto_index(request)
+    contexto = []
+    for k in dados:
+        if k == 'orcamento_total_mensal' or k == 'lancamento_total_mensal' or k == 'orcamento_total_anual' or k == 'lancamento_total_anual' or k == 'autorizacao_total_mensal':
+            obj = {}
+            lista = []
+            for dado in dados[k]:
+                lista.append(dado)
+            obj[k] = lista
+            contexto.append(obj)
+        if k == 'mes' or k == 'data_selecionada':
+            obj = {}
+            obj[k] = dados[k]
+            contexto.append(obj)
+        if k == 'categorias':
+            lista = []
+            obj = {}
+            for categoria in dados[k]:
+                obj_cat = {'categoria': categoria.nome}
+                lista.append(obj_cat)
+            obj[k] = lista
+            contexto.append(obj)
+                
+            
+    return Response(contexto) 
+
+
+def contexto_index(request):
     if request.method == 'POST':
-        data_selecionada = request.POST['data']
-        ano = data_selecionada[0:4]
-        mes = data_selecionada[5:]
+            data_selecionada = request.POST['data']
+            ano = data_selecionada[0:4]
+            mes = data_selecionada[5:]
     else:
         data = datetime.datetime.now()
         ano = data.strftime("%Y")
@@ -19,67 +55,53 @@ def index(request):
         data_selecionada = f'{ano}-{mes}'
 
 
-    orcamento_total_mensal = Orcamento.objects.filter(data_orcamento__month = mes, data_orcamento__year = ano).values('categoria__nome').annotate(total_mes = Sum('valor_orc'))
-    lancamento_total_mensal = Lancamento.objects.filter(data_pagamento__month = mes, data_pagamento__year = ano).values('categoria__nome').annotate(total_mes = Sum('valor_pago'))
-    orcamento_total_anual = Orcamento.objects.filter(data_orcamento__year = ano).values('categoria__nome').annotate(total_mes = Sum('valor_orc'))
-    lancamento_total_anual = Lancamento.objects.filter(data_pagamento__year = ano).values('categoria__nome').annotate(total_mes = Sum('valor_pago'))
-    autorizacao_total_mensal = Autorizacao.objects.filter(
-        data_autorizacao__month = mes, 
-        data_autorizacao__year = ano, 
-        utilizada = False,
-        autorizacao_status = 'APR'
-        ).values('categoria__nome').annotate(total_mes = Sum('valor_autorizacao'))
-    categorias = Categoria.objects.all().order_by('nome')
+        orcamento_total_mensal = Orcamento.objects.filter(data_orcamento__month = mes, data_orcamento__year = ano).values('categoria__nome').annotate(total_mes = Sum('valor_orc'))
+        lancamento_total_mensal = Lancamento.objects.filter(data_pagamento__month = mes, data_pagamento__year = ano).values('categoria__nome').annotate(total_mes = Sum('valor_pago'))
+        orcamento_total_anual = Orcamento.objects.filter(data_orcamento__year = ano).values('categoria__nome').annotate(total_mes = Sum('valor_orc'))
+        lancamento_total_anual = Lancamento.objects.filter(data_pagamento__year = ano).values('categoria__nome').annotate(total_mes = Sum('valor_pago'))
+        autorizacao_total_mensal = Autorizacao.objects.filter(
+            data_autorizacao__month = mes, 
+            data_autorizacao__year = ano, 
+            utilizada = False,
+            autorizacao_status = 'APR'
+            ).values('categoria__nome').annotate(total_mes = Sum('valor_autorizacao'))
+        categorias = Categoria.objects.all().order_by('nome')
 
-    context = {
-        'orcamento_total_mensal' : orcamento_total_mensal,
-        'lancamento_total_mensal' : lancamento_total_mensal,
-        'orcamento_total_anual' : orcamento_total_anual,
-        'lancamento_total_anual' : lancamento_total_anual,
-        'autorizacao_total_mensal' : autorizacao_total_mensal,
-        'categorias' : categorias,
-        'data_selecionada' : data_selecionada,
-        'mes': mes
-    }
-    
-    return render(request, 'orcamento/index.html', context)
+        context = {
+            'orcamento_total_mensal' : orcamento_total_mensal,
+            'lancamento_total_mensal' : lancamento_total_mensal,
+            'orcamento_total_anual' : orcamento_total_anual,
+            'lancamento_total_anual' : lancamento_total_anual,
+            'autorizacao_total_mensal' : autorizacao_total_mensal,
+            'categorias' : categorias,
+            'data_selecionada' : data_selecionada,
+            'mes': mes
+        }
+        return context
 
 @login_required
 def testa_arquivo(request):
-
-    lista_meses = {
-                    "01":"Janeiro",
-                    "02":"Fevereiro",
-                    "03":"Março",
-                    "04":"Abril",
-                    "05":"Maio",
-                    "06":"Junho",
-                    "07":"Julho",
-                    "08":"Agosto",
-                    "09":"Setembro",
-                    "10":"Outubro",
-                    "11":"Novembro",
-                    "12":"Dezembro",
-                    }
     
     if request.method == 'POST':
-        arquivo_teste = request.FILES['arquivo']
-        mes = request.POST['mes']
-       
-        print(mes[5:7])
+        arquivo = request.FILES['arquivo']
+        planilha = request.POST['planilha']
+        col_data = request.POST['col_data'].upper()
+        col_descricao = request.POST['col_descricao'].upper()
+        col_valor = request.POST['col_valor'].upper()
+        col_categoria = request.POST['col_categoria'].upper()
 
-        wb = load_workbook(arquivo_teste)
+        wb = load_workbook(arquivo)
 
-        ws = wb.get_sheet_by_name(lista_meses[mes[5:7]])
+        ws = wb.get_sheet_by_name(planilha)
 
-        for data in ws['N']:
-            if data.value != 'Data de pagamento':
+        for data in ws[col_data]:
+            if type(data.value) == datetime.datetime:
                 lancamentos_a_excluir = Lancamento.objects.filter(data_pagamento__month = data.value.strftime("%m"), data_pagamento__year = data.value.strftime("%Y"))
                 for lancamento in lancamentos_a_excluir:
                     lancamento.delete()
                 break
         
-        for cell1, cell2, cell3, cell4 in zip(ws['C'], ws['D'], ws['G'], ws['N']):
+        for cell1, cell2, cell3, cell4 in zip(ws[col_categoria], ws[col_descricao], ws[col_valor], ws[col_data]):
             if type(cell3.value) == type(3.14) and cell1.value != None and cell2.value != None and cell4.value != None:
                 
                 cat = Categoria.objects.filter(nome = cell1.value)
@@ -88,7 +110,7 @@ def testa_arquivo(request):
                     categoria = Categoria.objects.create(nome = cell1.value)
                 else:
                     categoria = cat[0]
-                
+                print(type(cell4.value))
                 valor_pago = round(cell3.value,2) 
                 lanca = Lancamento.objects.create(categoria = categoria, descricao = cell2.value, valor_pago = valor_pago, data_pagamento = cell4.value)
                 lanca.save()

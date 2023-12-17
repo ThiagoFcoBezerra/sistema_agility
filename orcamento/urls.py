@@ -20,5 +20,6 @@ urlpatterns = [
     path('despacha_autorizacao', views.despacha_autorizacao , name='despacha_autorizacao'),
     path('utiliza_autorizacao', views.utiliza_autorizacao , name='utiliza_autorizacao'),
     path('detalha_autorizacao/<int:id>', views.detalha_autorizacao , name='detalha_autorizacao'),
+    path('api_index', views.api_index, name='api_index'),
 
 ]

@@ -41,23 +41,23 @@ class Autorizacao(models.Model):
             ("pode_despachar", "Pode despachar autorizações"),
         ]
     
-    APROVADO = 'APR'
-    REPROVADO = 'REP'
-    AGUARDANDO = 'AGU'
-    status = [
-        (APROVADO, 'Aprovado'),
-        (REPROVADO, 'Reprovado'),
-        (AGUARDANDO, 'Aguardando')
+    STATUS = [
+        ('APR', 'Aprovado'),
+        ('REP', 'Reprovado'),
+        ('AGU', 'Aguardando')
     ]
     
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE)
     data_criacao = models.DateField(auto_now_add=True)
     data_autorizacao = models.DateField(auto_now=True)
     valor_autorizacao = models.DecimalField(max_digits=11, decimal_places=2)
-    autorizacao_status = models.CharField(choices=status, default=AGUARDANDO, max_length=20)
+    autorizacao_status = models.CharField(choices=STATUS, default='AGU', max_length=3, blank=False, null=False)
     justificativa = models.TextField(blank=False)
     despacho = models.TextField(blank=True)
     descreve_utilizacao = models.TextField(blank=True)
     utilizada = models.BooleanField(default=False, blank=True)
     solicitante = models.ForeignKey(User, on_delete=models.CASCADE,related_name='solicitante', null=True)
     despachante = models.ForeignKey(User, on_delete=models.CASCADE, related_name='despachante', null=True, blank=True)
+    
+    def __str__(self):
+        return f'{self.data_criacao} / {self.categoria} / {self.valor_autorizacao} / {self.autorizacao_status}'
