@@ -59,15 +59,15 @@ def usuarios(request):
     
     return render(request, 'usuarios/usuarios.html', contexto)
 
-@login_required
-@permission_required('auth.delete_usuario')
-def exclui_usuario(request, id):
-    user = User.objects.get(pk = id)
+# @login_required
+# @permission_required('auth.delete_usuario')
+# def exclui_usuario(request, id):
+#     user = User.objects.get(pk = id)
 
-    user.is_active = False
-    user.save()
+#     user.is_active = False
+#     user.save()
 
-    return redirect('usuarios')
+#     return redirect('usuarios')
 
 @login_required
 @permission_required('auth.change_usuario')

@@ -11,6 +11,15 @@
                 </ol>
             </nav>
     <h3>Autorizações de Despesas</h3>
+    <div>
+      <form>
+        <label>
+          Selecione a data:
+          <input type='month' name='data' value={{data | date:"Y-m" }}>
+        </label>
+        <input type='submit'/>
+      </form>
+    </div>
     <div class="row border-dark border rounded p-1 vh-100 m-1">
         <div class="col-lg-6 col-md-12 overflow-auto">
             <h4>Aguardando despacho</h4>
@@ -25,7 +34,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                    {% for aut in aguardando %}
+                    {% for aut in page_aguardando %}
                     
                         <tr>
                             <th scope="row">{{aut.id}}</th>
@@ -37,6 +46,22 @@
                 {% endfor %}
                 </tbody>
             </table>    
+            <div class="pagination">
+              <span class="step-links">
+                  {% if page_aguardando.has_previous %}
+                      <a href="?data={{data | date:"Y-m-d"}}&page_agu=1">&laquo; Primeira</a>
+                      <a href="?data={{data | date:"Y-m-d"}}&page_agu={{ page_aguardando.previous_page_number }}">anterior</a>
+                  {% endif %}
+                  <span class="current">
+                      Página {{ page_aguardando.number }} de {{ page_aguardando.paginator.num_pages }}.
+                  </span>
+          
+                  {% if page_aguardando.has_next %}
+                      <a href="?data={{data | date:"Y-m-d"}}&page_agu={{ page_aguardando.next_page_number }}">Próxima</a>
+                      <a href="?data={{data | date:"Y-m-d"}}&page_agu={{ page_aguardando.paginator.num_pages }}">Última &raquo;</a>
+                  {% endif %}
+              </span>
+            </div>
         </div>
         <div class="col-lg-6 col-md-12 overflow-auto">
             <h4>Despachadas</h4>
@@ -52,7 +77,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                    {% for aut in despachadas %}
+                    {% for aut in page_despachada %}
                   <tr>
                     <th scope="row">{{aut.id}}</th>
                     <td><a href="{% url 'detalha_autorizacao' id=aut.id %}">{{aut.categoria}}</a></td>
@@ -68,6 +93,22 @@
                 {% endfor %}
                 </tbody>
             </table>
+            <div class="pagination">
+              <span class="step-links">
+                  {% if page_despachada.has_previous %}
+                      <a href="?data={{data | date:"Y-m-d"}}&page_des=1">&laquo; Primeira</a>
+                      <a href="?data={{data | date:"Y-m-d"}}&page_des={{ page_despachada.previous_page_number }}">anterior</a>
+                  {% endif %}
+                  <span class="current">
+                      Página {{ page_despachada.number }} de {{ page_despachada.paginator.num_pages }}.
+                  </span>
+          
+                  {% if page_despachada.has_next %}
+                      <a href="?data={{data | date:"Y-m-d"}}&page_des={{ page_despachada.next_page_number }}">Próxima</a>
+                      <a href="?data={{data | date:"Y-m-d"}}&page_des={{ page_despachada.paginator.num_pages }}">Última &raquo;</a>
+                  {% endif %}
+              </span>
+            </div>
         </div>
     </div>
 </div>

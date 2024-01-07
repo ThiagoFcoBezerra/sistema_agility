@@ -1,4 +1,5 @@
 import datetime
+from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
 from openpyxl import load_workbook
 from orcamento.models import Categoria, Lancamento, Orcamento, Faturamento, Autorizacao
@@ -55,29 +56,29 @@ def contexto_index(request):
         data_selecionada = f'{ano}-{mes}'
 
 
-        orcamento_total_mensal = Orcamento.objects.filter(data_orcamento__month = mes, data_orcamento__year = ano).values('categoria__nome').annotate(total_mes = Sum('valor_orc'))
-        lancamento_total_mensal = Lancamento.objects.filter(data_pagamento__month = mes, data_pagamento__year = ano).values('categoria__nome').annotate(total_mes = Sum('valor_pago'))
-        orcamento_total_anual = Orcamento.objects.filter(data_orcamento__year = ano).values('categoria__nome').annotate(total_mes = Sum('valor_orc'))
-        lancamento_total_anual = Lancamento.objects.filter(data_pagamento__year = ano).values('categoria__nome').annotate(total_mes = Sum('valor_pago'))
-        autorizacao_total_mensal = Autorizacao.objects.filter(
-            data_autorizacao__month = mes, 
-            data_autorizacao__year = ano, 
-            utilizada = False,
-            autorizacao_status = 'APR'
-            ).values('categoria__nome').annotate(total_mes = Sum('valor_autorizacao'))
-        categorias = Categoria.objects.all().order_by('nome')
+    orcamento_total_mensal = Orcamento.objects.filter(data_orcamento__month = mes, data_orcamento__year = ano).values('categoria__nome').annotate(total_mes = Sum('valor_orc'))
+    lancamento_total_mensal = Lancamento.objects.filter(data_pagamento__month = mes, data_pagamento__year = ano).values('categoria__nome').annotate(total_mes = Sum('valor_pago'))
+    orcamento_total_anual = Orcamento.objects.filter(data_orcamento__year = ano).values('categoria__nome').annotate(total_mes = Sum('valor_orc'))
+    lancamento_total_anual = Lancamento.objects.filter(data_pagamento__year = ano).values('categoria__nome').annotate(total_mes = Sum('valor_pago'))
+    autorizacao_total_mensal = Autorizacao.objects.filter(
+        data_autorizacao__month = mes, 
+        data_autorizacao__year = ano, 
+        utilizada = False,
+        autorizacao_status = 'APR'
+        ).values('categoria__nome').annotate(total_mes = Sum('valor_autorizacao'))
+    categorias = Categoria.objects.all().order_by('nome')
 
-        context = {
-            'orcamento_total_mensal' : orcamento_total_mensal,
-            'lancamento_total_mensal' : lancamento_total_mensal,
-            'orcamento_total_anual' : orcamento_total_anual,
-            'lancamento_total_anual' : lancamento_total_anual,
-            'autorizacao_total_mensal' : autorizacao_total_mensal,
-            'categorias' : categorias,
-            'data_selecionada' : data_selecionada,
-            'mes': mes
-        }
-        return context
+    context = {
+        'orcamento_total_mensal' : orcamento_total_mensal,
+        'lancamento_total_mensal' : lancamento_total_mensal,
+        'orcamento_total_anual' : orcamento_total_anual,
+        'lancamento_total_anual' : lancamento_total_anual,
+        'autorizacao_total_mensal' : autorizacao_total_mensal,
+        'categorias' : categorias,
+        'data_selecionada' : data_selecionada,
+        'mes': mes
+    }
+    return context
 
 @login_required
 def testa_arquivo(request):
@@ -347,13 +348,25 @@ def despacha_autorizacao(request):
 
 @login_required
 def lista_autorizacao(request):
-    autorizacoes = Autorizacao.objects.all().order_by('-data_criacao')
+    data = request.GET.get("data")
+    if not data:
+        data = datetime.datetime.now()
+    else:
+        data = datetime.date(int(data[0:4]), int(data[5:7]), 1)
+    autorizacoes = Autorizacao.objects.filter(data_autorizacao__month = data.strftime('%m'), data_autorizacao__year = data.strftime('%Y')).order_by('-data_criacao')
     aguardando = autorizacoes.filter(autorizacao_status = 'AGU')
     despachadas = autorizacoes.exclude(autorizacao_status = 'AGU')
+    pag_aguardando = Paginator(aguardando, 10)
+    pag_despachadas = Paginator(despachadas, 10)
+    page_number_aguardando = request.GET.get("page_agu")
+    page_number_despachada = request.GET.get("page_des")
+    page_aguardando = pag_aguardando.get_page(page_number_aguardando)
+    page_despachada = pag_despachadas.get_page(page_number_despachada)
 
     context = {
-        'aguardando': aguardando,
-        'despachadas': despachadas,
+        'page_aguardando':page_aguardando,
+        'page_despachada':page_despachada,
+        'data': data,
     }
     return render (request, 'orcamento/lista_autorizacoes.html', context)
 
