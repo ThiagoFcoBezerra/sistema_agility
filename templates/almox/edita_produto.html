@@ -1,0 +1,89 @@
+{% extends 'partials/base2.html' %}
+{% load static %}
+
+{% block content %}
+
+{% include 'partials/menu.html' %}
+
+<div class = 'container'>
+    <h1>Edita Produto</h1>
+    {% if mensagens %}
+    {% for mensagem in mensagens%}
+    <div class="alert alert-success" role="alert">
+        {{mensagem}}
+    </div>
+    {% endfor %}
+    {% endif %}
+    <img src="/media/{{produto.imagem}}" class="img-fluid" alt="..." width="250px">
+    <form method='POST' enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class = 'form-group'>
+            <label class="custom-control-label" for='nome'>Nome:</label>
+            <input class="form-control" id='nome' type='text' name='nome'value="{{produto.nome}}" required/>
+        </div>
+        <div class = 'form-group'>
+            <label class="custom-control-label" for='descricao'/>Descrição:</label>
+            <textarea class="form-control" id='descricao' name='descricao' required>{{produto.descricao}}</textarea>
+        </div>
+        <div class = 'form-group'>
+            <label class="custom-control-label" for='categoria'/>Categoria:</label>
+            <select class="form-control" id='categoria' name='categoria' required>
+            {% for categoria in categorias%}
+                {% if categoria.id == produto.categoria.id %}
+                <option value = {{categoria.id}} selected>{{categoria.nome}}</option>
+                {% else %}
+                <option value = {{categoria.id}}>{{categoria.nome}}</option>
+                {% endif %}
+            {% endfor %}   
+            </select>
+            <a href={% url 'cadastra_categoria'%}>+ Categoria</a>
+        </div>
+        <div class = 'form-group'>
+            <label class="custom-control-label" for='marca'/>Marca:</label>
+            <select class="form-control" id='marca' name='marca' required>
+            {% for marca in marcas %}
+                {% if marca.id == produto.marca.id %}
+                <option value = {{marca.id}} selected>{{marca.nome}}</option>
+                {% else %}
+                <option value = {{marca.id}}>{{marca.nome}}</option>
+                {% endif %}
+            {% endfor %}   
+            </select>
+            <a href={% url 'cadastra_marca' %}>+ Marca</a>
+        </div>
+        <div class = 'form-group'>
+            <label class="custom-control-label" for = 'quantidade_minima'>Quantidade minima:</label>
+            <input class="form-control" id = 'quantidade_minima' type = 'number' name = 'quantidade_minima' value={{produto.quantidade_minima}} required />
+        </div>
+        <div class = 'form-group'>
+            <label class="custom-control-label" for='unidade'/>Unidade:</label>
+            <select class="form-control" id='unidade' name='unidade' required>
+                {% for unidade in unidades %}
+                    <option value = {{unidade.id}}>{{unidade.nome}}</option>
+                {% endfor %}   
+            </select>
+            <a href={% url 'cadastra_unidade'%}>+ Unidade</a>
+        </div>
+        <div class = 'form-group'>
+            {% if produto.status == 'A'%}
+            <input class="custom-control-input" id = 'status' type = 'checkbox' name = 'status' value = 'A' checked/>
+            {% else %}
+            <input class="custom-control-input" id = 'status' type = 'checkbox' name = 'status' value = 'A'/>
+            {% endif %}
+            <label class="custom-control-label" for = 'status'>Ativo:</label>
+        </div>
+        <div class = 'form-group'>
+            <label class="custom-control-label" for = 'imagem'>Imagem:</label>
+            <input class="form-control" id = 'imagem' type = 'file' name = 'imagem' accept="image/*"/>
+        </div>
+        <div class = 'form-group mb-2'>
+            <label class="custom-control-label" for='observacao'/>Observação:</label>
+            <textarea class="form-control" id='observacao' name='observacao'></textarea>
+        </div>
+        <button class="btn btn-primary" type='submit'>Cadastrar</button>
+        <a href= {% url 'produtos' %} class="btn btn-primary">Voltar</a>
+    </form>
+</div>    
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+{% include 'partials/footer.html' %}
+{% endblock %}

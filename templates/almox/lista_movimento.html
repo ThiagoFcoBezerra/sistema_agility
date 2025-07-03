@@ -1,0 +1,42 @@
+{% extends 'partials/base2.html' %}
+{% load static %}
+
+{% block content %}
+
+{% include 'partials/menu.html' %}
+
+<div class = 'container'>
+  <div class='d-flex justify-content-between'>
+      <h1 class="d-inline">Movimentos do Item</h1>
+      <a href={% url 'recupera_itens' id=id %} class="btn btn-primary d-inline my-auto">Movimentar</a>
+  </div>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>item_produto</th>
+          <th>data</th>
+          <th>usuario</th>
+          <th>tipo_movimento</th>
+          <th>responsavel</th>
+          <th>local_origem</th>
+          <th>local_destino</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in movimentos %}
+        <tr>
+          <td>{{item.item_produto}}</td>
+          <td>{{item.data}}</td>
+          <td>{{item.usuario}}</td>
+          <td>{{item.tipo_movimento}}</td>
+          <td>{{item.responsavel}}</td>
+          <td>{{item.local_origem}}</td>
+          <td>{{item.local_destino}}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>    
+</div>    
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+{% include 'partials/footer.html' %}
+{% endblock %}

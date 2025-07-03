@@ -13,11 +13,17 @@
     <h3>Autorizações de Despesas</h3>
     <div>
       <form>
-        <label>
-          Selecione a data:
-          <input type='month' name='data' value={{data | date:"Y-m" }}>
-        </label>
-        <input type='submit'/>
+        <div class="row row-cols-auto border border-dark rounded-2 p-2 mx-1 justify-content-start align-items-center">
+          <div class="col">
+            <label class="form-label">Selecione o período</label>
+          </div>
+          <div class="col">
+            <input class="form-control" id="data" type='month' name='data' value={{data | date:"Y-m" }}>
+          </div>
+          <div class="col">
+            <input type="submit" class="btn btn-primary" name="">
+          </div>
+        </div>
       </form>
     </div>
     <div class="row border-dark border rounded p-1 vh-100 m-1">

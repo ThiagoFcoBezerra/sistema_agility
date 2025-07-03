@@ -1,0 +1,64 @@
+{% extends 'partials/base2.html' %}
+{% load static %}
+
+{% block content %}
+
+{% include 'partials/menu.html' %}
+<div class='container'>
+    <h1>Pedidos</h1>
+    <div class='row'>
+<div class="col">
+  <h3>Pedidos a Despachar</h3>
+  
+  <ul class="list-group">
+    {% for pedido in pedidos_a_despachar %}
+    <li class="list-group-item list-group-item-primary">
+      <div>
+        {{pedido}}
+      </div>
+      <div class="btn-group btn-group-sm my-2" role="group" aria-label="Basic example">
+        <a href={% url 'despacha_pedido' id=pedido.id %} class="btn btn-primary">Despachar</a>
+        <a href='#' class="btn btn-primary ">Alterar</a>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+  <div class="col">
+    <h3>Pedidos Despachados</h3>
+    <ul class='list-group'>
+      {% for pedido in pedidos_despachados %}
+      {% if pedido.status == 'DEF'%}
+      <li class="list-group-item list-group-item-primary">
+        <div>
+          {{pedido}}
+        </div>
+        <div class="btn-group my-2 btn-group-sm" role="group" aria-label="Basic example">
+          <a href={% url 'entrega_pedido' id=pedido.id %} class="btn btn-primary">Entregar</a>
+        </div>
+      {% elif pedido.status == 'IND'%}
+      <li class="list-group-item list-group-item-danger">
+        <div>
+          {{pedido}}
+        </div>
+        <div class="btn-group my-2 btn-group-sm" role="group" aria-label="Basic example">
+          
+        </div>
+      {% elif pedido.status == 'ENT' %}
+      <li class="list-group-item list-group-item-warning">
+        <div>
+          {{pedido}}
+        </div>
+        <div class="btn-group my-2 btn-group-sm" role="group" aria-label="Basic example">
+          <a href={% url 'recebe_pedido' id=pedido.id %} class="btn btn-primary">Receber</a>
+        </div>
+      {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+{% include 'partials/footer.html' %}
+{% endblock %}

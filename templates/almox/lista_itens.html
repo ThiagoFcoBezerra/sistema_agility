@@ -1,0 +1,56 @@
+{% extends 'partials/base2.html' %}
+{% load static %}
+
+{% block content %}
+
+{% include 'partials/menu.html' %}
+
+<div class = 'container'>
+  <div class='row'>
+    <div class='col'>
+      <h1>Itens de Produtos</h1>
+    </div>
+      <form class="form-inline">
+        <div class='d-flex flex-row'>
+          <input class="form-control me-2" type="search" placeholder="Digite o número de série" aria-label="Pesquisar" name = "busca">
+          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Pesquisar</button>
+        </div>
+      </form>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>produto</th>
+          <th>data_aquisicao</th>
+          <th>data_entrada</th>
+          <th>data_situacao</th>
+          <th>data_garantia</th>
+          <th>numero_serie</th>
+          <th>situacao</th>
+          <th>localizacao</th>
+          <th>fornecedor</th>
+          <th>custo</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in lista %}
+        <tr>
+          <td><a href={% url 'lista_movimento' id=item.id %}>{{item.produto}}</a></td>
+          <td>{{item.data_aquisicao}}</td>
+          <td>{{item.data_entrada}}</td>
+          <td>{{item.data_situacao}}</td>
+          <td>{{item.data_garantia}}</td>
+          <td>{{item.numero_serie}}</td>
+          <td>{{item.situacao}}</td>
+          <td>{{item.localizacao}}</td>
+          <td>{{item.fornecedor}}</td>
+          <td>{{item.custo}}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+    
+</div>    
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+{% include 'partials/footer.html' %}
+{% endblock %}

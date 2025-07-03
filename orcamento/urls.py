@@ -1,9 +1,14 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
+from rest_framework import routers
+
+router = routers.DefaultRouter()
+router.register(r'categoria', views.CategoriaViewSet)
 
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('api/', include(router.urls)),
     path('testa_arquivo', views.testa_arquivo , name='testa_arquivo'),
     path('orcamento', views.orcamento, name='orcamento'),
     path('cadastra_orcamento', views.cadastra_orcamento, name='cadastra_orcamento'),
@@ -20,6 +25,8 @@ urlpatterns = [
     path('despacha_autorizacao', views.despacha_autorizacao , name='despacha_autorizacao'),
     path('utiliza_autorizacao', views.utiliza_autorizacao , name='utiliza_autorizacao'),
     path('detalha_autorizacao/<int:id>', views.detalha_autorizacao , name='detalha_autorizacao'),
-    #path('api_index', views.api_index, name='api_index'),
+    path('api_index', views.api_index, name='api_index'),
+    path('getTotalLancamento/<int:id>/<int:m>/<int:a>', views.getTotalLancamento, name='getTotalLancamento'),
+    path('getTotalOrcamento/<int:id>/<int:m>/<int:a>', views.getTotalOrcamento, name='getTotalOrcamento'),
 
 ]

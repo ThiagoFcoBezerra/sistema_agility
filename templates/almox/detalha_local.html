@@ -1,0 +1,46 @@
+{% extends 'partials/base2.html' %}
+{% load static %}
+
+{% block content %}
+
+{% include 'partials/menu.html' %}
+
+<div class = 'container'>
+    <h1>Almoxarifado</h1>
+    {% if mensagens %}
+    {% for mensagem in mensagens %}
+    <div class="alert alert-success" role="alert">
+        {{mensagem}}
+    </div>
+    {% endfor %}
+    {% endif %}
+    {{local}}
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">id</th>
+          <th scope="col">Produto</th>
+          <th scope="col">Situacao</th>
+          <th scope="col">Número de Série</th>
+          <th scope="col">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in itens_produtos %}
+        <tr>
+          <th scope="row">{{item.id}}</th>
+          <td>{{item.produto}}</td>
+          <td>{{item.situacao}}</td>
+          <td>{{item.numero_serie}}</td>
+          <td>
+            <a class= "btn btn-primary" href ="{% url 'move_itens' id=item.id %}"><i class="bi bi-gear"></i> Mover</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {{item}}
+</div>    
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+{% include 'partials/footer.html' %}
+{% endblock %}

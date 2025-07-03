@@ -1,0 +1,55 @@
+{% extends 'partials/base2.html' %}
+{% load static %}
+
+{% block content %}
+
+{% include 'partials/menu.html' %}
+
+<div class = 'container'>
+    <h1>Cadastrar Almoxarifado</h1>
+    {% if mensagens %}
+    {% for mensagem in mensagens %}
+    <div class="alert alert-success" role="alert">
+        {{mensagem}}
+    </div>
+    {% endfor %}
+    {% endif %}
+    <form>
+    <div class="input-group mb-3">
+        <input type="text" class="form-control" name = "busca" placeholder="Buscar Usuário" aria-label="Buscar Usuário" aria-describedby="button-addon2">
+        <div class="input-group-append">
+          <button class="btn btn-primary" type="submit" id="button-addon2">Buscar</button>
+        </div>
+      </div>
+    </form>
+    <form method='POST' enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="input-group mb-3 w-auto">
+            <div class="input-group-prepend">
+              <label class="input-group-text" for="inputGroupSelect01">Usuário</label>
+            </div>
+            <select class="form-control custom-select" id="inputGroupSelect01" name="responsavel">
+              {% for usuario in  usuarios %}
+              <option value="{{usuario.id}}">{{usuario.username}}</option>
+              {% endfor %}
+            </select>
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="basic-addon1">Local:</span>
+            </div>
+            <input type="text" class="form-control" placeholder="Descreva o local" aria-label="Descreva o local" aria-describedby="basic-addon1" name="local">
+        </div>
+        <div class="form-check mb-2">
+            <input class="form-check-input" type="checkbox" name="principal" id="defaultCheck1">
+            <label class="form-check-label" for="defaultCheck1">
+              Principal
+            </label>
+          </div>
+        <button class="btn btn-primary" type='submit'>Cadastrar</button>
+        <a href= {% url 'produtos' %} class="btn btn-primary" type='submit'>Voltar</a>
+    </form>
+</div>    
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+{% include 'partials/footer.html' %}
+{% endblock %}
