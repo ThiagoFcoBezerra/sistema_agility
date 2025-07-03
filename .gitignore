@@ -5,9 +5,10 @@ sistema/settings.py
 *.pyc
 __pycache__/
 local_settings.py
-db.sqlite3
+venv/db.sqlite3
 db.sqlite3-journal
 media
+almoxarifado.txt
 
 # Environments
 .env

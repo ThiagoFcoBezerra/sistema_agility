@@ -1,0 +1,47 @@
+{% extends 'partials/base2.html' %}
+{% load static %}
+
+{% block content %}
+
+{% include 'partials/menu.html' %}
+<div class='container'>
+    <h1> Produtos</h1>
+    <div class='row'>
+        <div class='col-5 col-md-5 col-lg-4 col-xl-3'>
+            <div class="card">
+                <img src="/media/{{dados_produto.0.imagem}}"  class="card-img-top" alt='imagem do produto'>
+                <div class="card-body">
+                    <h5 class="card-title">{{dados_produto.0.nome}}</h5>
+                    <p class="card-text">{{dados_produto.0.descricao}}</p>
+                    <p class="card-text">Estoque: {{dados_produto.0.quant}} {{dados_produto.0.unidade__sigla}}</p>
+                    <form method = 'POST'>
+                        {% csrf_token %}
+                        <label for = 'quantidade'>Informe a quantidade</label>
+                        <input type='number' id='quantidade' name='quantidade'>
+                        <button type = 'submit'>ok</button>
+                        {% if mensagens %}
+                        {% for m in mensagens %}
+                            <div class="alert alert-danger" role="alert">
+                            {{m}}
+                            </div>
+                        {% endfor %}
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class='col-5'>
+            <h3>{{pedido_atual}}</h3>
+            <ul>
+            {% for item in itens %}
+                <li>{{item.produto}}</li>
+            {% endfor %}
+            </ul>
+            <a href = "{% url 'fecha_pedido' id=pedido_atual.id %}" class='btn btn-primary'>Fechar Pedido</a>
+            <a href = "{% url 'produtos' %}" class='btn btn-primary'>Produtos</a>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+{% include 'partials/footer.html' %}
+{% endblock %}

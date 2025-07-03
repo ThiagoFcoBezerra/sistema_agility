@@ -1,0 +1,22 @@
+{% extends 'partials/base2.html' %}
+{% load static %}
+
+{% block content %}
+
+{% include 'partials/menu.html' %}
+
+<div class = 'container'>
+    <h1>Cadastrar Categoria</h1>
+    <form method='POST' enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class = 'form-group mb-2'>
+            <label class="custom-control-label" for='nome'>Nome:</label>
+            <input class="form-control" id='nome' type='text' name='nome' required/>
+        </div>
+        <button class="btn btn-primary" type='submit'>Cadastrar</button>
+        <a href= {% url 'produtos' %} class="btn btn-primary" type='submit'>Voltar</a>
+    </form>
+</div>    
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+{% include 'partials/footer.html' %}
+{% endblock %}

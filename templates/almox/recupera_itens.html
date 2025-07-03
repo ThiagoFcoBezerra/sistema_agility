@@ -1,0 +1,65 @@
+{% extends 'partials/base2.html' %}
+{% load static %}
+
+{% block content %}
+
+{% include 'partials/menu.html' %}
+<div class='container'>
+    <h1> Produtos</h1>
+    <div class='row'>
+        {% if mensagens %}
+        {% for mensagem in mensagens %}
+        <div class="alert alert-success" role="alert">
+        {{mensagem}}  
+        </div>
+        {% endfor %}
+        {% elif alertas %}
+        {% for alerta in alertas %}
+        <div class="alert alert-warning" role="alert">
+        {{alerta}}  
+        </div>
+        {% endfor %}
+        {% endif %}
+        <table class="table">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Produto</th>
+                    <th scope="col">Entrada</th>
+                    <th scope="col">Situação</th>
+                    <th scope="col">Nr. Série</th>
+                    <th scope="col">Valor</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{item.produto}}</td>
+                    <td>{{item.data_entrada}}</td>
+                    <td>{{item.situacao}}</td>
+                    <td>{{item.numero_serie}}</td>
+                    <td>{{item.custo}}</td>
+                </tr>
+            </tbody>
+        </table>
+        {% if sucesso %}
+        <a href="{% url 'pedidos'%}"> Voltar </a>
+        {% else %}
+        <form method='POST'>
+            {% csrf_token %}
+          <div class = 'form-group'>
+            <label class="custom-control-label" for='local'/>Local:</label>
+            <select class="form-control" id='local' name='local' required>
+            {% for local in locais %}
+                <option value = {{local.id}}>{{local.local}}</option>
+            {% endfor %}   
+            </select>
+        </div>
+        <div class = 'form-group my-2'>
+            <input class = 'btn btn-primary' type='submit'/>
+        </div>
+        </form>
+        {% endif %}
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+{% include 'partials/footer.html' %}
+{% endblock %}

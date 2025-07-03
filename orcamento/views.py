@@ -6,9 +6,11 @@ from orcamento.models import Categoria, Lancamento, Orcamento, Faturamento, Auto
 from django.db.models.aggregates import Sum
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import User
-from rest_framework.decorators import api_view
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import permission_classes, api_view
 from rest_framework.response import Response
-
+from rest_framework import viewsets
+from orcamento.serializers import CategoriaSerializer
 
 @login_required
 def index(request):
@@ -94,13 +96,16 @@ def testa_arquivo(request):
         wb = load_workbook(arquivo)
 
         ws = wb.get_sheet_by_name(planilha)
-
+        mes = ''
         for data in ws[col_data]:
             if type(data.value) == datetime.datetime:
-                lancamentos_a_excluir = Lancamento.objects.filter(data_pagamento__month = data.value.strftime("%m"), data_pagamento__year = data.value.strftime("%Y"))
-                for lancamento in lancamentos_a_excluir:
-                    lancamento.delete()
-                break
+                if data.value.strftime('%m') != mes:
+                    lancamentos_a_excluir = Lancamento.objects.filter(data_pagamento__month = data.value.strftime("%m"), data_pagamento__year = data.value.strftime("%Y"))
+                    for lancamento in lancamentos_a_excluir:
+                        print(lancamento)
+                        lancamento.delete()
+                        mes = data.value.strftime('%m')
+
         
         for cell1, cell2, cell3, cell4 in zip(ws[col_categoria], ws[col_descricao], ws[col_valor], ws[col_data]):
             if type(cell3.value) == type(3.14) and cell1.value != None and cell2.value != None and cell4.value != None:
@@ -111,7 +116,6 @@ def testa_arquivo(request):
                     categoria = Categoria.objects.create(nome = cell1.value)
                 else:
                     categoria = cat[0]
-                print(type(cell4.value))
                 valor_pago = round(cell3.value,2) 
                 lanca = Lancamento.objects.create(categoria = categoria, descricao = cell2.value, valor_pago = valor_pago, data_pagamento = cell4.value)
                 lanca.save()
@@ -391,3 +395,22 @@ def utiliza_autorizacao(request):
 
 
     return redirect('lista_autorizacao')
+
+class CategoriaViewSet(viewsets.ModelViewSet):
+    """ Retorna todas as categorias """
+    
+    queryset = Categoria.objects.all().order_by('nome')
+    serializer_class = CategoriaSerializer
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def getTotalLancamento(request, id, m, a):
+    total_lancamento = Lancamento.objects.filter(categoria = id, data_pagamento__month = m, data_pagamento__year = a).values('categoria__nome').annotate(total = Sum('valor_pago'))
+    return Response(total_lancamento)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def getTotalOrcamento(request, id, m, a):
+    total_orcamento = Orcamento.objects.filter(categoria = id, data_orcamento__month = m, data_orcamento__year = a).values('categoria__nome').annotate(total = Sum('valor_orc'))
+    
+    return Response(total_orcamento)

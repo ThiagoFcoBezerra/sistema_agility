@@ -1,0 +1,74 @@
+{% extends 'partials/base2.html' %}
+{% load static %}
+
+{% block content %}
+
+{% include 'partials/menu.html' %}
+<div class='container'>
+    <h1> Pedido</h1>
+    <h3>{{pedido}}</h3>
+    {% if mensagens %}
+    {%for m in mensagens %}
+    <div class="alert alert-success" role="alert">
+      {{m}}
+    </div>
+    {% endfor %}
+    {% endif %}
+    <div class='row'>
+      {% if habilita %}
+      <table class="table">
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col">Sel</th>
+            <th scope="col">Produto</th>
+            <th scope="col">Marca</th>
+            <th scope="col">Selecione o Item</th>
+          </tr>
+        </thead>
+        <tbody>
+          {%for item in itens_pedido %}
+          <form method='POST'>
+            {% csrf_token %}
+                <tr>
+                    <td><input type = 'number' name = 'item' value='{{item.id}}' readonly/></td>
+                    <td>{{item.produto}}</td>
+                    <td>{{item.produto.marca}}</td>
+                    <td>
+                      <select name = 'item_produto' required>
+                        {% for itensProd in lista %}
+                          {% for prod in itensProd %}
+                            {% if prod.produto.id == item.produto.id %}
+                            <option value = {{prod.id}}>{{prod}}</option>
+                            {% endif %}
+                          {% endfor %}
+                        {% endfor %}
+                      </select>
+                      <div class="form-group mb-2">
+                        <label for="exampleFormControlSelect1">Selecione o Destino:</label>
+                        <select class="form-control" id="exampleFormControlSelect1" name='local' required>
+                            {% for local in local_destino%}
+                            <option value='{{local.id}}'>{{local}}</option>
+                            {% endfor %}
+                        </select>
+                      </div>
+                      <button type="submit" class="btn btn-primary mb-2">Confirmar</button>
+                    </td>
+                </tr>
+              </form>
+                {% endfor %}
+            </tbody>
+          </table>  
+        <a class="btn btn-primary mb-2" href="{% url 'pedidos' %}">Voltar</a>
+        {% else %}
+        {%for a in alertas %}
+        <div class="alert alert-danger" role="alert">
+          {{a}}
+        </div>
+        <a class="btn btn-primary mb-2" href="{% url 'pedidos' %}">Voltar</a>
+        {% endfor %}
+        {% endif %}
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+{% include 'partials/footer.html' %}
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends 'partials/base2.html' %}
+{% load static %}
+
+{% block content %}
+
+{% include 'partials/menu.html' %}
+<div class='container'>
+    <h1>Entrada de Produtos</h1>
+    <div class='row'>
+        {% if mensagens %}
+        {% for mensagem in mensagens%}
+        <div class="alert alert-success" role="alert">
+            {{mensagem}}
+        </div>
+        {% endfor %}
+        {% endif %}
+    </div>
+    <div class = 'container'>
+        <h3>{{produto.nome}}</h3>
+        <h4>{{produto.descricao}}</h4>
+        <form method='POST' enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class = 'form-group'>
+                <label class="custom-control-label" for='data_aquisicao'>Data de Aquisição:</label>
+                <input class="form-control" id='data_aquisicao' type='Date' name='data_aquisicao' value='{{dados_form.data_aquisicao}}' required/>
+            </div>
+            <div class = 'form-group'>
+                <label class="custom-control-label" for='garantia'>Garantia (em dias):</label>
+                <input class="form-control" id='garantia' type='number' name='garantia' value='{{dados_form.garantia}}' required/>
+            </div>
+            <div class = 'form-group'>
+                <label class="custom-control-label" for='num_serie'>Número de Série:</label>
+                <input class="form-control" id='num_serie' type='text' name='num_serie' maxlength = '30' required/>
+            </div>
+            <div class = 'form-group'>
+                <label class="custom-control-label" for='local'/>Local:</label>
+                <select class="form-control" id='local' name='local' required>
+                {% for local in locais %}
+                    <option value = {{local.id}}>{{local.local}}</option>
+                {% endfor %}   
+                </select>
+            </div>
+            <div class = 'form-group'>
+                <label class="custom-control-label" for='fornecedor'/>Fornecedor:</label>
+                <select class="form-control" id='fornecedor' name='fornecedor' required>
+                {% for fornecedor in fornecedores %}
+                    <option value = {{fornecedor.id}}>{{fornecedor.nome}}</option>
+                {% endfor %}   
+                </select>
+                <a href="{% url 'cadastra_fornecedor' %}">+</a>
+            </div>
+            <div class = 'form-group'>
+                <label class="custom-control-label" for = 'custo'>Custo de Aquisição:</label>
+                <input class="form-control" id = 'custo' type = 'number' name = 'custo' required step = '0.01' value='{{dados_form.custo}}'/>
+            </div>
+            <div class="custom-control custom-switch">
+                {% if 'fixa' in dados_form %}
+                <input type="checkbox" class="custom-control-input" id="customSwitch1" name = 'fixa' checked>
+                {% else %}
+                <input type="checkbox" class="custom-control-input" id="customSwitch1" name = 'fixa'>
+                {% endif %}
+                <label class="custom-control-label" for="customSwitch1">Fixar dados</label>
+              </div>
+            <div class = 'form-group'>
+                <button class="btn btn-primary my-2" type='submit'>Cadastrar</button>
+                <a href={% url 'produtos' %} class='btn btn-primary my-2'>Cancelar</a>
+            </div>
+        </form>
+    </div>    
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+{% include 'partials/footer.html' %}
+{% endblock %}

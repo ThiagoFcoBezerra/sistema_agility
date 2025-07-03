@@ -1,0 +1,32 @@
+{% extends 'partials/base2.html' %}
+{% load static %}
+
+{% block content %}
+
+{% include 'partials/menu.html' %}
+
+<div class = 'container'>
+  <div class='row'>
+    <div class='col'>
+      <h1>Almoxarifado</h1>
+    </div>
+    <div class='col d-flex flex-row-reverse'>
+      <a href="{% url 'cadastra_local' %}" class="btn btn-primary my-auto"><i class="bi bi-card-list me-2"></i>Novo</a>
+    </div>
+  </div>
+    <div class="list-group">
+      {% for local in locais %}
+      <a href="{% url 'detalha_local' id=local.id %}" class="list-group-item list-group-item-action">
+        <div class="d-flex w-100 justify-content-between">
+          <h5 class="mb-1">{{local.local}}</h5>
+          <small>{{local.responsavel}}</small>
+        </div>
+        <p class="mb-1">Some placeholder content in a paragraph.</p>
+        <small>And some small print.</small>
+      </a>
+      {% endfor %}
+    </div>
+</div>    
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+{% include 'partials/footer.html' %}
+{% endblock %}

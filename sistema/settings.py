@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'orcamento',
     'usuarios',
     'cliente',
+    'almox',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -131,6 +132,9 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'orcamento/static')
 ]
 
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = 'media/'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
@@ -139,11 +143,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_REDIRECT_URL = 'index'
 LOGOUT_REDIRECT_URL = 'login'
 
-#REST_FRAMEWORK = {
-#    'DEFAULT_RENDERER_CLASSES': [
-#        'rest_framework.renderers.JSONRenderer',
-#    ],
-#    'DEFAULT_PARSER_CLASSES': [
-#        'rest_framework.parsers.JSONParser',
-#    ]
-#}
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ]
+}
