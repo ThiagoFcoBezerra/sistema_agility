@@ -1,3 +1,10 @@
+============================================== Pendências ==============================================
+Corrigir link home
+
+
+========================================================================================================
+
+
 Permitir cadastrar produtos ok 
 produtos serão categorizados de acordo com utilização ok
 permitir registrar entrada de produtos ok
